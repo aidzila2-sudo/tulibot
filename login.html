@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoiceScript + Sign Language AI - Login</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 14C14.2091 14 16 12.2091 16 10V6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6V10C8 12.2091 9.79086 14 12 14Z" stroke="#7c6dfa" stroke-width="2"/>
+                        <path d="M19 10V11C19 14.866 15.866 18 12 18C8.13401 18 5 14.866 5 11V10" stroke="#7c6dfa" stroke-width="2"/>
+                        <path d="M12 18V22" stroke="#7c6dfa" stroke-width="2"/>
+                        <path d="M8 22H16" stroke="#7c6dfa" stroke-width="2"/>
+                    </svg>
+                    <h1>VoiceScript + Sign Language AI</h1>
+                </div>
+                <p class="tagline">Speak to Text with Touchless Gesture Control</p>
+            </div>
+            
+            <form id="loginForm" class="login-form">
+                <div class="form-group">
+                    <label for="email">Email / Username</label>
+                    <input type="text" id="email" name="email" required placeholder="Masukkan email atau username">
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" name="password" required placeholder="Masukkan password">
+                </div>
+                
+                <div id="loginError" class="error-message" style="display: none;"></div>
+                
+                <button type="submit" class="btn-primary">Login</button>
+            </form>
+            
+            <div class="login-info">
+                <p>Akun Demo:</p>
+                <p class="demo-cred">admin@voicescript.com | password</p>
+            </div>
+        </div>
+    </div>
+    
+    <script src="js/login.js"></script>
+</body>
+</html>

@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoiceScript Ultimate - Fixed</title>
+    <style>
+        :root {
+            --bg-primary: #07070f;
+            --bg-secondary: #0f0f1a;
+            --bg-tertiary: #151525;
+            --accent-primary: #7c6dfa;
+            --accent-secondary: #a78bfa;
+            --accent-danger: #ef4444;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: var(--font-sans);
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        /* Login Page */
+        #loginPage {
+            display: none;
+            min-height: 100vh;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        #loginPage.active { display: flex !important; }
+        
+        .login-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 32px;
+            width: 100%;
+            max-width: 450px;
+        }
+        
+        .login-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+        
+        .login-header h1 {
+            color: var(--accent-primary);
+            margin-bottom: 8px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+        
+        .form-group input {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 15px;
+        }
+        
+        .btn-primary {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+        
+        .demo-badges {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .demo-badge {
+            display: inline-flex;
+            gap: 8px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            padding: 10px 14px;
+            border-radius: 10px;
+            cursor: pointer;
+            margin: 4px;
+            font-size: 13px;
+        }
+        
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-danger);
+            padding: 12px;
+            border-radius: 10px;
+            margin-bottom: 16px;
+            font-size: 13px;
+            display: none;
+        }
+
+        /* App Page */
+        #appPage { display: none; }
+        #appPage.active { display: flex; min-height: 100vh; }
+        
+        .app-wrapper { display: flex; flex: 1; }
+        
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            position: fixed;
+            top: 0; left: 0; bottom: 0;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: var(--accent-primary);
+            font-weight: 700;
+            margin-bottom: 24px;
+        }
+        
+        .nav-item {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            padding: 14px 16px;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 8px;
+            transition: all 0.3s;
+        }
+        
+        .nav-item.active, .nav-item:hover {
+            background: rgba(124, 109, 250, 0.15);
+            color: var(--accent-primary);
+            border: 1px solid rgba(124, 109, 250, 0.2);
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 24px;
+        }
+        
+        /* Sections */
+        .section { display: none; }
+        .section.active { display: block; }
+        
+        /* Welcome Card */
+        .welcome-card {
+            background: linear-gradient(135deg, var(--bg-secondary), var(--bg-tertiary));
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        /* Shortcuts */
+        .shortcut-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        
+        .shortcut-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .shortcut-card:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-4px);
+        }
+        
+        .shortcut-icon { font-size: 48px; margin-bottom: 12px; }
+        
+        /* Voice Section */
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            margin-bottom: 16px;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+        }
+        
+        .status-dot.recording {
+            background: var(--accent-danger);
+            animation: pulse 1s ease-in-out infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        .transcript-area {
+            width: 100%;
+            min-height: 300px;
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            color: var(--text-primary);
+            font-size: 16px;
+            resize: vertical;
+            margin-bottom: 24px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 24px;
+        }
+        
+        .btn-secondary {
+            padding: 10px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+        
+        .mic-container {
+            text-align: center;
+        }
+        
+        .mic-button {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            border: none;
+            color: white;
+            font-size: 32px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .mic-button.recording {
+            background: var(--accent-danger);
+            animation: pulseMic 1.2s ease-in-out infinite;
+        }
+        
+        @keyframes pulseMic {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        
+        /* Camera */
+        .webcam-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 24px;
+        }
+        
+        .webcam-video {
+            width: 100%;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            transform: scaleX(-1);
+        }
+        
+        .hands-canvas {
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            transform: scaleX(-1);
+        }
+        
+        .gesture-status {
+            background: rgba(7, 7, 15, 0.95);
+            padding: 12px;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .toggle-camera-btn {
+            position: absolute;
+            top: 16px; right: 16px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(7, 7, 15, 0.95);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+        
+        /* Bottom Nav (Mobile) */
+        .bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0; left: 0; right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 8px 0;
+        }
+        
+        .bottom-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+        }
+        
+        .bottom-item.active { color: var(--accent-primary); }
+        
+        @media (max-width: 1024px) {
+            .sidebar { display: none; }
+            .main-content { margin-left: 0; }
+            .bottom-nav { display: flex; }
+        }
+        
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+    <!-- Login Page -->
+    <div id="loginPage" class="active">
+        <div class="login-card">
+            <div class="login-header">
+                <h1>🎤 VoiceScript Ultimate</h1>
+                <p style="color: var(--text-secondary);">Speech-to-Text with Gesture Controls</p>
+            </div>
+            
+            <div id="loginError" class="error-message"></div>
+            
+            <div class="form-group">
+                <label>Username / Email</label>
+                <input type="text" id="inputUser" placeholder="Enter your username">
+            </div>
+            
+            <div class="form-group">
+                <label>Password</label>
+                <input type="password" id="inputPass" placeholder="Enter your password">
+            </div>
+            
+            <button id="btnLogin" class="btn-primary">Login to Dashboard</button>
+            
+            <div class="demo-badges">
+                <p style="color: var(--text-secondary); margin-bottom: 8px; font-size: 13px;">Demo Accounts (click to auto-fill):</p>
+                <div class="demo-badge" data-username="admin" data-password="1234">👑 Admin (admin/1234)</div>
+                <div class="demo-badge" data-username="user" data-password="abcd">👤 User (user/abcd)</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Page -->
+    <div id="appPage">
+        <div class="app-wrapper">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-brand">
+                    <span style="font-size: 32px;">🎤</span>
+                    <span>VoiceScript</span>
+                </div>
+                
+                <nav>
+                    <button class="nav-item active" data-section="home">
+                        <span style="font-size: 20px;">🏠</span> Home
+                    </button>
+                    <button class="nav-item" data-section="voice">
+                        <span style="font-size: 20px;">🎙️</span> Voice to Text
+                    </button>
+                    <button class="nav-item" data-section="camera">
+                        <span style="font-size: 20px;">📷</span> Gesture Control
+                    </button>
+                    <button class="nav-item" data-section="lessons">
+                        <span style="font-size: 20px;">📚</span> Learn Signs
+                    </button>
+                </nav>
+                
+                <div style="margin-top: auto;">
+                    <p style="font-size: 14px; margin-bottom: 12px;" id="sidebarUserName">User</p>
+                    <button id="btnLogout" class="btn-secondary" style="width: 100%;">Logout</button>
+                </div>
+            </aside>
+            
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Home Section -->
+                <section id="home" class="section active">
+                    <div class="welcome-card">
+                        <h1 style="font-size: 28px; margin-bottom: 8px;">Welcome! 👋</h1>
+                        <p style="color: var(--text-secondary);">Start using VoiceScript Ultimate!</p>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div style="font-size: 32px;">📝</div>
+                            <div>
+                                <div style="font-size: 24px; font-weight: 700;" id="statChars">0</div>
+                                <div style="color: var(--text-secondary); font-size: 13px;">Characters</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div style="font-size: 32px;">📄</div>
+                            <div>
+                                <div style="font-size: 24px; font-weight: 700;" id="statTranscripts">0</div>
+                                <div style="color: var(--text-secondary); font-size: 13px;">Transcripts</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="shortcut-grid">
+                        <button class="shortcut-card" data-section="voice">
+                            <div class="shortcut-icon">🎙️</div>
+                            <div style="font-weight: 600;">Voice to Text</div>
+                            <div style="color: var(--text-secondary); font-size: 13px; margin-top: 4px;">Quick speech transcription</div>
+                        </button>
+                        <button class="shortcut-card" data-section="camera">
+                            <div class="shortcut-icon">✋</div>
+                            <div style="font-weight: 600;">Gesture Control</div>
+                            <div style="color: var(--text-secondary); font-size: 13px; margin-top: 4px;">Control with gestures</div>
+                        </button>
+                        <button class="shortcut-card" data-section="lessons">
+                            <div class="shortcut-icon">📚</div>
+                            <div style="font-weight: 600;">Learn Signs</div>
+                            <div style="color: var(--text-secondary); font-size: 13px; margin-top: 4px;">Practice sign language</div>
+                        </button>
+                    </div>
+                </section>
+                
+                <!-- Voice to Text Section -->
+                <section id="voice" class="section">
+                    <h2 style="margin-bottom: 24px; color: var(--accent-primary);">🎙️ Voice to Text</h2>
+                    
+                    <div class="status-indicator">
+                        <span class="status-dot" id="voiceStatusDot"></span>
+                        <span id="voiceStatusText">Ready to record. Click mic button.</span>
+                    </div>
+                    
+                    <textarea id="voiceTranscript" class="transcript-area" placeholder="Your transcript will appear here..."></textarea>
+                    
+                    <div class="action-buttons">
+                        <button id="copyVoiceBtn" class="btn-secondary">📋 Copy</button>
+                        <button id="clearVoiceBtn" class="btn-secondary">🗑️ Clear</button>
+                        <button id="downloadVoiceBtn" class="btn-secondary">📥 Download</button>
+                        <button id="saveVoiceBtn" class="btn-secondary" style="background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); color: white;">💾 Save</button>
+                    </div>
+                    
+                    <div class="mic-container">
+                        <button id="voiceMicBtn" class="mic-button">🎙️</button>
+                        <p style="color: var(--text-secondary); margin-top: 12px;" id="voiceMicHint">Click to start</p>
+                    </div>
+                </section>
+                
+                <!-- Camera Control Section -->
+                <section id="camera" class="section">
+                    <h2 style="margin-bottom: 24px; color: var(--accent-primary);">📷 Gesture Control</h2>
+                    
+                    <div class="status-indicator">
+                        <span class="status-dot" id="cameraStatusDot"></span>
+                        <span id="cameraStatusText">Click camera button to start.</span>
+                    </div>
+                    
+                    <textarea id="cameraTranscript" class="transcript-area" placeholder="Text will appear when you use gestures..."></textarea>
+                    
+                    <div class="webcam-container">
+                        <video id="webcamVideo" class="webcam-video" autoplay playsinline muted></video>
+                        <canvas id="webcamCanvas" class="hands-canvas"></canvas>
+                        <div id="gestureStatus" class="gesture-status">Camera not active</div>
+                        <button id="toggleCameraBtn" class="toggle-camera-btn">📷</button>
+                    </div>
+                    
+                    <div class="action-buttons">
+                        <button id="copyCameraBtn" class="btn-secondary">📋 Copy</button>
+                        <button id="clearCameraBtn" class="btn-secondary">🗑️ Clear</button>
+                        <button id="downloadCameraBtn" class="btn-secondary">📥 Download</button>
+                        <button id="saveCameraBtn" class="btn-secondary" style="background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); color: white;">💾 Save</button>
+                    </div>
+                </section>
+                
+                <!-- Lessons Section -->
+                <section id="lessons" class="section">
+                    <h2 style="margin-bottom: 24px; color: var(--accent-primary);">📚 Learn Sign Language</h2>
+                    
+                    <div style="display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap;">
+                        <button class="btn-secondary lesson-btn active" data-lesson="alphabet" style="background: var(--accent-primary); color: white;">Alphabet A-Z</button>
+                        <button class="btn-secondary lesson-btn" data-lesson="numbers">Numbers 0-10</button>
+                    </div>
+                    
+                    <div id="alphabetGrid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 12px; margin-bottom: 24px;"></div>
+                    <div id="numbersGrid" class="hidden" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 12px; margin-bottom: 24px;"></div>
+                </section>
+            </main>
+            
+            <!-- Bottom Navigation -->
+            <nav class="bottom-nav">
+                <button class="bottom-item active" data-section="home">
+                    <span style="font-size: 24px;">🏠</span>
+                    <span style="font-size: 11px;">Home</span>
+                </button>
+                <button class="bottom-item" data-section="voice">
+                    <span style="font-size: 24px;">🎙️</span>
+                    <span style="font-size: 11px;">Voice</span>
+                </button>
+                <button class="bottom-item" data-section="camera">
+                    <span style="font-size: 24px;">📷</span>
+                    <span style="font-size: 11px;">Gestures</span>
+                </button>
+                <button class="bottom-item" data-section="lessons">
+                    <span style="font-size: 24px;">📚</span>
+                    <span style="font-size: 11px;">Learn</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- MediaPipe -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    
+    <script>
+        // Global Variables
+        let hands = null;
+        let cameraStream = null;
+        let speechRecognition = null;
+        let lastGestureTime = 0;
+        
+        // State
+        const state = {
+            user: null,
+            currentSection: 'home',
+            isRecording: false,
+            isCameraOn: false,
+            selectedLessonItem: null,
+            transcripts: []
+        };
+        
+        // Demo Accounts
+        const demoAccounts = [
+            { username: 'admin', password: '1234', role: 'Admin' },
+            { username: 'user', password: 'abcd', role: 'User' }
+        ];
+        
+        // --- Utils ---
+        function safeGet(key) {
+            try { return JSON.parse(localStorage.getItem(key)); } catch (e) { return null; }
+        }
+        
+        function safeSet(key, value) {
+            try { localStorage.setItem(key, JSON.stringify(value)); } catch (e) {}
+        }
+        
+        // --- Login/Logout ---
+        function login(username, role) {
+            state.user = { username, role };
+            safeSet('voicescript_user', state.user);
+            document.getElementById('sidebarUserName').textContent = username;
+            document.getElementById('loginPage').classList.remove('active');
+            document.getElementById('appPage').classList.add('active');
+            renderLessons();
+            loadStats();
+        }
+        
+        function logout() {
+            cleanupCurrentSection();
+            state.user = null;
+            localStorage.removeItem('voicescript_user');
+            document.getElementById('appPage').classList.remove('active');
+            document.getElementById('loginPage').classList.add('active');
+            document.getElementById('inputUser').value = '';
+            document.getElementById('inputPass').value = '';
+            document.getElementById('loginError').style.display = 'none';
+        }
+        
+        // --- Navigation ---
+        function switchSection(sectionId) {
+            cleanupCurrentSection();
+            state.currentSection = sectionId;
+            
+            document.querySelectorAll('.section').forEach(sec => {
+                sec.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+            
+            document.querySelectorAll('.nav-item, .bottom-item').forEach(item => {
+                item.classList.toggle('active', item.dataset.section === sectionId);
+            });
+        }
+        
+        function cleanupCurrentSection() {
+            stopRecording();
+            if (state.currentSection === 'camera') stopCamera();
+        }
+        
+        // --- Speech Recognition ---
+        function initSpeechRecognition() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                return null;
+            }
+            
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            const rec = new SR();
+            rec.continuous = true;
+            rec.interimResults = true;
+            rec.lang = 'id-ID';
+            
+            rec.onresult = (event) => {
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript;
+                }
+                
+                if (state.currentSection === 'voice') {
+                    document.getElementById('voiceTranscript').value += transcript;
+                } else if (state.currentSection === 'camera') {
+                    document.getElementById('cameraTranscript').value += transcript;
+                }
+            };
+            
+            rec.onend = () => {
+                if (state.isRecording) {
+                    try { rec.start(); } catch (e) {}
+                }
+            };
+            
+            return rec;
+        }
+        
+        function toggleRecording() {
+            if (state.isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        }
+        
+        function startRecording() {
+            if (!speechRecognition) speechRecognition = initSpeechRecognition();
+            if (!speechRecognition) return;
+            
+            try {
+                speechRecognition.start();
+                state.isRecording = true;
+                document.getElementById('voiceMicBtn').classList.add('recording');
+                document.getElementById('voiceMicBtn').textContent = '🔴';
+                document.getElementById('voiceStatusDot').classList.add('recording');
+                document.getElementById('voiceStatusText').textContent = 'Listening...';
+                document.getElementById('voiceMicHint').textContent = 'Click to stop';
+            } catch (e) {}
+        }
+        
+        function stopRecording() {
+            if (!speechRecognition) return;
+            
+            try { speechRecognition.stop(); } catch (e) {}
+            state.isRecording = false;
+            
+            document.getElementById('voiceMicBtn').classList.remove('recording');
+            document.getElementById('voiceMicBtn').textContent = '🎙️';
+            document.getElementById('voiceStatusDot').classList.remove('recording');
+            document.getElementById('voiceStatusText').textContent = 'Ready to record. Click mic button.';
+            document.getElementById('voiceMicHint').textContent = 'Click to start';
+        }
+        
+        // --- Camera & MediaPipe ---
+        async function initCamera() {
+            if (typeof Hands === 'undefined') {
+                console.warn('MediaPipe not loaded');
+                return;
+            }
+            
+            if (!hands) {
+                hands = new Hands({
+                    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+                });
+                
+                hands.setOptions({
+                    maxNumHands: 1,
+                    modelComplexity: 0,
+                    minDetectionConfidence: 0.7,
+                    minTrackingConfidence: 0.5
+                });
+                
+                hands.onResults(onHandsResults);
+            }
+            
+            try {
+                cameraStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: { ideal: 640 }, height: { ideal: 480 } }
+                });
+                
+                const video = document.getElementById('webcamVideo');
+                video.srcObject = cameraStream;
+                
+                const sendFrame = async () => {
+                    if (!state.isCameraOn) return;
+                    try {
+                        if (hands && video.readyState >= 2) {
+                            await hands.send({ image: video });
+                        }
+                    } catch (e) {}
+                    requestAnimationFrame(sendFrame);
+                };
+                
+                sendFrame();
+                
+            } catch (e) {
+                console.error('Camera error:', e);
+                document.getElementById('cameraStatusText').textContent = 'Failed to access camera';
+            }
+        }
+        
+        function onHandsResults(results) {
+            const canvas = document.getElementById('webcamCanvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            ctx.save();
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            if (results.multiHandLandmarks) {
+                for (const landmarks of results.multiHandLandmarks) {
+                    if (typeof drawingUtils !== 'undefined') {
+                        drawingUtils.drawConnectors(ctx, landmarks, Hands.HAND_CONNECTIONS, { color: '#7c6dfa', lineWidth: 2 });
+                        drawingUtils.drawLandmarks(ctx, landmarks, { color: '#ffffff', lineWidth: 1, radius: 3 });
+                    }
+                    
+                    const gesture = detectGesture(landmarks);
+                    handleGesture(gesture);
+                }
+            }
+            
+            ctx.restore();
+        }
+        
+        function detectGesture(landmarks) {
+            const thumbTip = landmarks[4];
+            const indexTip = landmarks[8];
+            const middleTip = landmarks[12];
+            const ringTip = landmarks[16];
+            const pinkyTip = landmarks[20];
+            const indexPIP = landmarks[6];
+            const middlePIP = landmarks[10];
+            const ringPIP = landmarks[14];
+            const pinkyPIP = landmarks[18];
+            
+            const thumbUp = thumbTip.y < indexTip.y && thumbTip.y < middleTip.y;
+            const indexUp = indexTip.y < indexPIP.y;
+            const middleUp = middleTip.y < middlePIP.y;
+            const ringUp = ringTip.y < ringPIP.y;
+            const pinkyUp = pinkyTip.y < pinkyPIP.y;
+            
+            if (thumbUp && !indexUp && !middleUp && !ringUp && !pinkyUp) return 'thumbsup';
+            if (indexUp && middleUp && ringUp && pinkyUp) return 'open';
+            if (!indexUp && !middleUp && !ringUp && !pinkyUp) return 'fist';
+            
+            return null;
+        }
+        
+        function handleGesture(gesture) {
+            const now = Date.now();
+            if (now - lastGestureTime < 1500) return;
+            lastGestureTime = now;
+            
+            if (!gesture) return;
+            
+            document.getElementById('gestureStatus').textContent = `Detected: ${gesture === 'thumbsup' ? '👍 Start' : gesture === 'open' ? '🖐️ Stop' : '✊ Clear'}`;
+            document.getElementById('gestureStatus').style.background = 'linear-gradient(135deg, #7c6dfa, #a78bfa)';
+            document.getElementById('gestureStatus').style.color = 'white';
+            setTimeout(() => {
+                document.getElementById('gestureStatus').style.background = 'rgba(7, 7, 15, 0.95)';
+                document.getElementById('gestureStatus').style.color = 'var(--text-primary)';
+            }, 500);
+            
+            if (gesture === 'thumbsup') toggleRecordingForCamera(true);
+            else if (gesture === 'open') toggleRecordingForCamera(false);
+            else if (gesture === 'fist') document.getElementById('cameraTranscript').value = '';
+        }
+        
+        function toggleRecordingForCamera(start) {
+            if (!speechRecognition) speechRecognition = initSpeechRecognition();
+            if (!speechRecognition) return;
+            
+            if (start && !state.isRecording) {
+                try {
+                    speechRecognition.start();
+                    state.isRecording = true;
+                    document.getElementById('cameraStatusDot').classList.add('recording');
+                    document.getElementById('cameraStatusText').textContent = 'Recording (🖐️ to stop)';
+                } catch (e) {}
+            } else if (!start && state.isRecording) {
+                try { speechRecognition.stop(); } catch (e) {}
+                state.isRecording = false;
+                document.getElementById('cameraStatusDot').classList.remove('recording');
+                document.getElementById('cameraStatusText').textContent = state.isCameraOn ? 'Camera active (👍 to start)' : 'Click camera button to start';
+            }
+        }
+        
+        function startCamera() {
+            state.isCameraOn = true;
+            document.getElementById('toggleCameraBtn').textContent = '🔴';
+            document.getElementById('cameraStatusDot').classList.add('recording');
+            document.getElementById('cameraStatusText').textContent = 'Camera active. Show gestures!';
+            document.getElementById('gestureStatus').textContent = 'Camera active';
+            initCamera();
+        }
+        
+        function stopCamera() {
+            try {
+                if (cameraStream) {
+                    cameraStream.getTracks().forEach(track => track.stop());
+                    cameraStream = null;
+                }
+                document.getElementById('webcamVideo').srcObject = null;
+            } catch (e) {
+                console.warn('Stop camera error:', e);
+            }
+            
+            state.isCameraOn = false;
+            document.getElementById('toggleCameraBtn').textContent = '📷';
+            document.getElementById('cameraStatusDot').classList.remove('recording');
+            document.getElementById('cameraStatusText').textContent = 'Click camera button to start';
+            document.getElementById('gestureStatus').textContent = 'Camera not active';
+            
+            if (state.isRecording) toggleRecordingForCamera(false);
+        }
+        
+        // --- Text Actions ---
+        function copyText(textareaId) {
+            const textarea = document.getElementById(textareaId);
+            if (textarea.value) {
+                navigator.clipboard.writeText(textarea.value);
+            }
+        }
+        
+        function clearText(textareaId) {
+            document.getElementById(textareaId).value = '';
+        }
+        
+        function downloadText(textareaId, filename) {
+            const textarea = document.getElementById(textareaId);
+            if (!textarea.value) return;
+            const blob = new Blob([textarea.value], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        async function saveTranscriptToCloud(textareaId, method) {
+            const textarea = document.getElementById(textareaId);
+            if (!textarea.value) return;
+            
+            // Simpan ke local storage dulu sebagai fallback
+            state.transcripts.push({
+                id: Date.now(),
+                text: textarea.value,
+                method,
+                created: new Date().toISOString()
+            });
+            safeSet('voicescript_transcripts', state.transcripts);
+            loadStats();
+            
+            // Coba simpan ke database via API
+            try {
+                const response = await fetch('../backend/api/save_transcript.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: state.user?.id || 1,
+                        text_content: textarea.value,
+                        language_used: 'id-ID',
+                        control_method: method
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status !== 'success') {
+                    console.warn('Gagal menyinkronkan ke database:', result.message);
+                    // Tampilkan pesan ringkas jika ingin
+                    // alert('Transkrip disimpan secara lokal (Mode Offline)');
+                }
+            } catch (error) {
+                console.warn('Gagal menyinkronkan data ke cloud database (Mode Offline):', error);
+                // Tidak menampilkan alert yang mengganggu, cukup log saja
+            }
+        }
+        
+        function saveTranscript(textareaId, method) {
+            saveTranscriptToCloud(textareaId, method);
+        }
+        
+        function loadStats() {
+            state.transcripts = safeGet('voicescript_transcripts') || [];
+            const totalChars = state.transcripts.reduce((sum, t) => sum + (t.text?.length || 0), 0);
+            document.getElementById('statChars').textContent = totalChars.toLocaleString();
+            document.getElementById('statTranscripts').textContent = state.transcripts.length;
+        }
+        
+        // --- Lessons ---
+        function renderLessons() {
+            const alphabetGrid = document.getElementById('alphabetGrid');
+            alphabetGrid.innerHTML = '';
+            for (let i = 65; i <= 90; i++) {
+                const char = String.fromCharCode(i);
+                const item = document.createElement('div');
+                item.style.cssText = 'background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.3s;';
+                item.innerHTML = `<span style="font-size: 24px; font-weight: 700;">${char}</span>`;
+                item.onclick = () => {
+                    document.querySelectorAll('#alphabetGrid div').forEach(el => el.style.borderColor = 'var(--border-color)');
+                    item.style.borderColor = 'var(--accent-primary)';
+                    item.style.background = 'rgba(124, 109, 250, 0.1)';
+                };
+                alphabetGrid.appendChild(item);
+            }
+            
+            const numbersGrid = document.getElementById('numbersGrid');
+            numbersGrid.innerHTML = '';
+            for (let i = 0; i <= 10; i++) {
+                const item = document.createElement('div');
+                item.style.cssText = 'background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: 12px; padding: 16px; text-align: center; cursor: pointer; transition: all 0.3s;';
+                item.innerHTML = `<span style="font-size: 24px; font-weight: 700;">${i}</span>`;
+                item.onclick = () => {
+                    document.querySelectorAll('#numbersGrid div').forEach(el => el.style.borderColor = 'var(--border-color)');
+                    item.style.borderColor = 'var(--accent-primary)';
+                    item.style.background = 'rgba(124, 109, 250, 0.1)';
+                };
+                numbersGrid.appendChild(item);
+            }
+        }
+        
+        function switchLesson(lesson) {
+            document.querySelectorAll('.lesson-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lesson === lesson);
+                if (btn.dataset.lesson === lesson) {
+                    btn.style.background = 'var(--accent-primary)';
+                    btn.style.color = 'white';
+                } else {
+                    btn.style.background = 'var(--bg-tertiary)';
+                    btn.style.color = 'var(--text-primary)';
+                }
+            });
+            
+            document.getElementById('alphabetGrid').classList.toggle('hidden', lesson !== 'alphabet');
+            document.getElementById('numbersGrid').classList.toggle('hidden', lesson !== 'numbers');
+        }
+        
+        // --- Event Listeners ---
+        function initEventListeners() {
+            // Demo badges
+            document.querySelectorAll('.demo-badge').forEach(badge => {
+                badge.onclick = () => {
+                    document.getElementById('inputUser').value = badge.dataset.username;
+                    document.getElementById('inputPass').value = badge.dataset.password;
+                    document.getElementById('loginError').style.display = 'none';
+                };
+            });
+            
+            // Login
+            document.getElementById('btnLogin').onclick = () => {
+                const username = document.getElementById('inputUser').value.trim();
+                const password = document.getElementById('inputPass').value;
+                
+                const account = demoAccounts.find(a =>
+                    a.username.toLowerCase() === username.toLowerCase() && a.password === password
+                );
+                
+                if (account) {
+                    login(account.username, account.role);
+                } else {
+                    document.getElementById('loginError').textContent = 'Invalid username or password';
+                    document.getElementById('loginError').style.display = 'block';
+                }
+            };
+            
+            // Logout
+            document.getElementById('btnLogout').onclick = logout;
+            
+            // Navigation
+            document.querySelectorAll('.nav-item, .bottom-item, .shortcut-card').forEach(item => {
+                item.onclick = () => {
+                    if (item.dataset.section) switchSection(item.dataset.section);
+                };
+            });
+            
+            // Voice Controls
+            document.getElementById('voiceMicBtn').onclick = toggleRecording;
+            document.getElementById('copyVoiceBtn').onclick = () => copyText('voiceTranscript');
+            document.getElementById('clearVoiceBtn').onclick = () => clearText('voiceTranscript');
+            document.getElementById('downloadVoiceBtn').onclick = () => downloadText('voiceTranscript', `voicescript-${Date.now()}.txt`);
+            document.getElementById('saveVoiceBtn').onclick = () => saveTranscript('voiceTranscript', 'voice');
+            
+            // Camera Controls
+            document.getElementById('toggleCameraBtn').onclick = () => {
+                state.isCameraOn ? stopCamera() : startCamera();
+            };
+            document.getElementById('copyCameraBtn').onclick = () => copyText('cameraTranscript');
+            document.getElementById('clearCameraBtn').onclick = () => clearText('cameraTranscript');
+            document.getElementById('downloadCameraBtn').onclick = () => downloadText('cameraTranscript', `voicescript-gesture-${Date.now()}.txt`);
+            document.getElementById('saveCameraBtn').onclick = () => saveTranscript('cameraTranscript', 'gesture');
+            
+            // Lessons
+            document.querySelectorAll('.lesson-btn').forEach(btn => {
+                btn.onclick = () => switchLesson(btn.dataset.lesson);
+            });
+        }
+        
+        // --- Initialize ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initEventListeners();
+            
+            const savedUser = safeGet('voicescript_user');
+            if (savedUser) {
+                login(savedUser.username, savedUser.role);
+            }
+            
+            loadStats();
+        });
+    </script>
+</body>
+</html>
