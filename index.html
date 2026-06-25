@@ -2,37 +2,458 @@
 <html lang="id">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VoiceScript Ultimate</title>
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <!-- MediaPipe Hands -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <style>
+        /* PERBAIKAN STATE AWAL & VISIBILITAS HALAMAN */
+        #appSection {
+            display: none;
+        }
+        #loginSection {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+    </style>
 </head>
 <body>
-    <div class="app-wrapper">
-        <!-- Sidebar for Desktop -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <div class="sidebar-brand">
-                    <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 14C14.2091 14 16 12.2091 16 10V6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6V10C8 12.2091 9.79086 14 12 14Z" stroke="#7c6dfa" stroke-width="2"/>
-                        <path d="M19 10V11C19 14.866 15.866 18 12 18C8.13401 18 5 14.866 5 11V10" stroke="#7c6dfa" stroke-width="2"/>
-                        <path d="M12 18V22" stroke="#7c6dfa" stroke-width="2"/>
-                        <path d="M8 22H16" stroke="#7c6dfa" stroke-width="2"/>
-                    </svg>
-                    <span>VoiceScript Ultimate</span>
+    <!-- LOGIN PAGE SECTION -->
+    <div id="loginSection" class="login-page">
+        <div class="login-container">
+            <div class="login-card">
+                <div class="login-header">
+                    <div class="logo">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 14C14.2091 14 16 12.2091 16 10V6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6V10C8 12.2091 9.79086 14 12 14Z" stroke="#7c6dfa" stroke-width="2"/>
+                            <path d="M19 10V11C19 14.866 15.866 18 12 18C8.13401 18 5 14.866 5 11V10" stroke="#7c6dfa" stroke-width="2"/>
+                            <path d="M12 18V22" stroke="#7c6dfa" stroke-width="2"/>
+                            <path d="M8 22H16" stroke="#7c6dfa" stroke-width="2"/>
+                        </svg>
+                        <h1>VoiceScript + Sign Language AI</h1>
+                    </div>
+                    <p class="tagline">Speak to Text with Touchless Gesture Control</p>
+                </div>
+                
+                <form id="loginForm" class="login-form">
+                    <div class="form-group">
+                        <label for="email">Email / Username</label>
+                        <input type="text" id="email" name="email" required placeholder="Masukkan email atau username">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" name="password" required placeholder="Masukkan password">
+                    </div>
+                    
+                    <div id="loginError" class="error-message" style="display: none;"></div>
+                    
+                    <button type="submit" class="btn-primary">Login</button>
+                </form>
+                
+                <div class="login-info">
+                    <p>Akun Demo:</p>
+                    <p class="demo-cred">admin@voicescript.com | password</p>
                 </div>
             </div>
+        </div>
+    </div>
 
-            <nav class="sidebar-nav">
-                <button class="sidebar-link active" data-page="home">
+    <!-- MAIN APP SECTION -->
+    <div id="appSection">
+        <div class="app-wrapper">
+            <!-- Sidebar for Desktop -->
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-brand">
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 14C14.2091 14 16 12.2091 16 10V6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6V10C8 12.2091 9.79086 14 12 14Z" stroke="#7c6dfa" stroke-width="2"/>
+                            <path d="M19 10V11C19 14.866 15.866 18 12 18C8.13401 18 5 14.866 5 11V10" stroke="#7c6dfa" stroke-width="2"/>
+                            <path d="M12 18V22" stroke="#7c6dfa" stroke-width="2"/>
+                            <path d="M8 22H16" stroke="#7c6dfa" stroke-width="2"/>
+                        </svg>
+                        <span>VoiceScript Ultimate</span>
+                    </div>
+                </div>
+
+                <nav class="sidebar-nav">
+                    <button class="sidebar-link active" data-page="home">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                            <polyline points="9 22 9 12 15 12 15 22"/>
+                        </svg>
+                        <span>Home</span>
+                    </button>
+                    
+                    <button class="sidebar-link" data-page="voicetotext">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 14C14.2091 14 16 12.2091 16 10V6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6V10C8 12.2091 9.79086 14 12 14Z"/>
+                            <path d="M19 10V11C19 14.866 15.866 18 12 18C8.13401 18 5 14.866 5 11V10"/>
+                            <path d="M12 18V22"/>
+                            <path d="M8 22H16"/>
+                        </svg>
+                        <span>Voice to Text</span>
+                    </button>
+                    
+                    <button class="sidebar-link" data-page="kamerakontrol">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                            <circle cx="12" cy="12" r="3"/>
+                        </svg>
+                        <span>Kamera Kontrol</span>
+                    </button>
+                    
+                    <button class="sidebar-link" data-page="belajarisyarat">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M12 19l7-7 3 3-7 7-3-3z"/>
+                            <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
+                            <path d="M2 2l7.586 7.586"/>
+                            <circle cx="11" cy="11" r="2"/>
+                        </svg>
+                        <span>Belajar Isyarat</span>
+                    </button>
+                </nav>
+
+                <div class="sidebar-footer">
+                    <div class="sidebar-user">
+                        <span class="user-name" id="sidebarUserName">User</span>
+                        <span class="user-role" id="sidebarUserRole">User</span>
+                    </div>
+                    <button id="sidebarLogoutBtn" class="btn-logout" title="Logout">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
+                            <polyline points="16 17 21 12 16 7"/>
+                            <line x1="21" y1="12" x2="9" y2="12"/>
+                        </svg>
+                        <span>Logout</span>
+                    </button>
+                </div>
+            </aside>
+
+            <!-- Main Content -->
+            <main class="main-content">
+                <!-- Top Navbar for Mobile -->
+                <header class="mobile-navbar">
+                    <div class="mobile-navbar-left">
+                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 14C14.2091 14 16 12.2091 16 10V6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6V10C8 12.2091 9.79086 14 12 14Z" stroke="#7c6dfa" stroke-width="2"/>
+                        </svg>
+                        <span>VoiceScript Ultimate</span>
+                    </div>
+                    <div class="mobile-navbar-right">
+                        <span class="mobile-user-name" id="mobileUserName">User</span>
+                    </div>
+                </header>
+
+                <!-- Halaman 1: HOME -->
+                <section id="page-home" class="page active">
+                    <div class="container">
+                        <div class="welcome-card">
+                            <h1 class="welcome-title">Selamat Datang 👋</h1>
+                            <p class="welcome-subtitle" id="welcomeUser">Mulai gunakan VoiceScript Ultimate untuk pengalaman transkripsi terbaik.</p>
+                        </div>
+
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polyline points="4 17 10 11 4 5"/>
+                                        <line x1="12" y1="19" x2="20" y2="19"/>
+                                    </svg>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-value" id="totalChars">0</div>
+                                    <div class="stat-label">Total Karakter</div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-value" id="totalWords">0</div>
+                                    <div class="stat-label">Total Kata</div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="12" cy="12" r="10"/>
+                                        <polyline points="12 6 12 12 16 14"/>
+                                    </svg>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-value" id="totalTranscripts">0</div>
+                                    <div class="stat-label">Transkripsi</div>
+                                </div>
+                            </div>
+                            
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <line x1="18" y1="20" x2="18" y2="10"/>
+                                        <line x1="12" y1="20" x2="12" y2="4"/>
+                                        <line x1="6" y1="20" x2="6" y2="14"/>
+                                    </svg>
+                                </div>
+                                <div class="stat-content">
+                                    <div class="stat-value" id="streakDays">1</div>
+                                    <div class="stat-label">Hari Berturut</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="shortcut-grid">
+                            <button class="shortcut-card" data-page="voicetotext">
+                                <span class="shortcut-icon">🎤</span>
+                                <span class="shortcut-title">Voice to Text</span>
+                                <span class="shortcut-desc">Transkripsi suara cepat</span>
+                            </button>
+                            
+                            <button class="shortcut-card" data-page="kamerakontrol">
+                                <span class="shortcut-icon">✋</span>
+                                <span class="shortcut-title">Kamera Kontrol</span>
+                                <span class="shortcut-desc">Kontrol lewat gestur</span>
+                            </button>
+                            
+                            <button class="shortcut-card" data-page="belajarisyarat">
+                                <span class="shortcut-icon">📚</span>
+                                <span class="shortcut-title">Belajar Isyarat</span>
+                                <span class="shortcut-desc">Pelajari bahasa isyarat</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Halaman 2: VOICE TO TEXT -->
+                <section id="page-voicetotext" class="page">
+                    <div class="container">
+                        <div class="card-header">
+                            <div class="language-selector">
+                                <label for="languageSelectVoice">Bahasa:</label>
+                                <select id="languageSelectVoice">
+                                    <optgroup label="Bahasa Nusantara">
+                                        <option value="id-ID" selected>🇮🇩 Indonesia</option>
+                                        <option value="jv-ID">🇯🇼 Jawa</option>
+                                        <option value="su-ID">🇸🇩 Sunda</option>
+                                    </optgroup>
+                                    <optgroup label="Bahasa Asia">
+                                        <option value="en-US">🇺🇸 Inggris (US)</option>
+                                        <option value="en-GB">🇬🇧 Inggris (UK)</option>
+                                        <option value="ar-SA">🇸🇦 Arab</option>
+                                        <option value="ja-JP">🇯🇵 Jepang</option>
+                                        <option value="ko-KR">🇰🇷 Korea</option>
+                                        <option value="zh-CN">🇨🇳 Mandarin</option>
+                                        <option value="hi-IN">🇮🇳 Hindi</option>
+                                    </optgroup>
+                                    <optgroup label="Bahasa Eropa">
+                                        <option value="es-ES">🇪🇸 Spanyol</option>
+                                        <option value="fr-FR">🇫🇷 Prancis</option>
+                                        <option value="de-DE">🇩🇪 Jerman</option>
+                                        <option value="pt-PT">🇵🇹 Portugis</option>
+                                        <option value="it-IT">🇮🇹 Italia</option>
+                                        <option value="tr-TR">🇹🇷 Turki</option>
+                                        <option value="ru-RU">🇷🇺 Rusia</option>
+                                    </optgroup>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="status-indicator" id="voiceStatusIndicator">
+                            <span class="status-dot" id="voiceStatusDot"></span>
+                            <span id="voiceStatusText">Siap merekam. Klik tombol mic.</span>
+                        </div>
+
+                        <textarea id="voiceTranscript" class="transcript-area" placeholder="Hasil transkripsi akan muncul di sini..."></textarea>
+
+                        <div class="action-buttons">
+                            <button id="copyVoiceBtn" class="btn-secondary" title="Salin">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+                                <span>Salin</span>
+                            </button>
+                            <button id="clearVoiceBtn" class="btn-secondary" title="Hapus">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"/>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                </svg>
+                                <span>Hapus</span>
+                            </button>
+                            <button id="downloadVoiceBtn" class="btn-secondary" title="Unduh">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                <span>Unduh</span>
+                            </button>
+                            <button id="saveVoiceBtn" class="btn-primary" title="Simpan">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V7l5-5h6l5 5v12a2 2 0 0 1-2 2z"/>
+                                    <polyline points="17 21 17 13 7 13 7 21"/>
+                                </svg>
+                                <span>Simpan</span>
+                            </button>
+                        </div>
+
+                        <div class="mic-container">
+                            <button id="voiceMicBtn" class="mic-button">
+                                <svg class="mic-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M12 14C14.2091 14 16 12.2091 16 10V6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6V10C8 12.2091 9.79086 14 12 14Z"/>
+                                    <path d="M19 10V11C19 14.866 15.866 18 12 18C8.13401 18 5 14.866 5 11V10"/>
+                                    <path d="M12 18V22"/>
+                                    <path d="M8 22H16"/>
+                                </svg>
+                            </button>
+                            <div id="voiceMicStatus" class="mic-status">Klik untuk mulai merekam</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Halaman 3: KAMERA KONTROL -->
+                <section id="page-kamerakontrol" class="page">
+                    <div class="container">
+                        <div class="card-header">
+                            <h2 class="page-title">Kamera Kontrol</h2>
+                        </div>
+
+                        <div class="status-indicator" id="cameraStatusIndicator">
+                            <span class="status-dot" id="cameraStatusDot"></span>
+                            <span id="cameraStatusText">Klik tombol untuk menyalakan kamera.</span>
+                        </div>
+
+                        <textarea id="cameraTranscript" class="transcript-area" placeholder="Teks akan muncul ketika Anda menggunakan gestur..."></textarea>
+
+                        <div class="camera-panel">
+                            <div class="webcam-container" id="webcamContainer">
+                                <video id="webcam" class="webcam-video" autoplay playsinline muted></video>
+                                <canvas id="handsCanvas" class="hands-canvas"></canvas>
+                                <div id="cameraGestureStatus" class="gesture-status">Kamera belum aktif</div>
+                                <button id="toggleCameraBtn" class="toggle-camera-btn" title="Toggle Camera">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <div class="gesture-guide">
+                                <h3>Panduan Gestur</h3>
+                                <div class="gesture-item">
+                                    <span class="gesture-emoji">👍</span>
+                                    <span class="gesture-text">Jempol Atas = Mulai Merekam</span>
+                                </div>
+                                <div class="gesture-item">
+                                    <span class="gesture-emoji">🖐️</span>
+                                    <span class="gesture-text">Tangan Terbuka = Berhenti</span>
+                                </div>
+                                <div class="gesture-item">
+                                    <span class="gesture-emoji">✊</span>
+                                    <span class="gesture-text">Mengepal = Hapus Teks</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="action-buttons">
+                            <button id="copyCameraBtn" class="btn-secondary" title="Salin">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+                                </svg>
+                                <span>Salin</span>
+                            </button>
+                            <button id="clearCameraBtn" class="btn-secondary" title="Hapus">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"/>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                </svg>
+                                <span>Hapus</span>
+                            </button>
+                            <button id="downloadCameraBtn" class="btn-secondary" title="Unduh">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                                    <polyline points="7 10 12 15 17 10"/>
+                                    <line x1="12" y1="15" x2="12" y2="3"/>
+                                </svg>
+                                <span>Unduh</span>
+                            </button>
+                            <button id="saveCameraBtn" class="btn-primary" title="Simpan">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M19 21H5a2 2 0 0 1-2-2V7l5-5h6l5 5v12a2 2 0 0 1-2 2z"/>
+                                    <polyline points="17 21 17 13 7 13 7 21"/>
+                                </svg>
+                                <span>Simpan</span>
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Halaman 4: BELAJAR ISYARAT -->
+                <section id="page-belajarisyarat" class="page">
+                    <div class="container">
+                        <div class="card-header">
+                            <h2 class="page-title">Belajar Bahasa Isyarat</h2>
+                        </div>
+
+                        <div class="lesson-selector">
+                            <button class="lesson-btn active" data-lesson="alphabet">Alfabet A-Z</button>
+                            <button class="lesson-btn" data-lesson="numbers">Angka 0-10</button>
+                            <button class="lesson-btn" data-lesson="greetings">Sapaan</button>
+                        </div>
+
+                        <div id="lessonContent" class="lesson-content">
+                            <div class="lesson-grid" id="alphabetGrid">
+                                <!-- Alfabet akan di-generate oleh JS -->
+                            </div>
+                            <div class="lesson-grid hidden" id="numbersGrid">
+                                <!-- Angka akan di-generate oleh JS -->
+                            </div>
+                            <div class="lesson-grid hidden" id="greetingsGrid">
+                                <!-- Sapaan akan di-generate oleh JS -->
+                            </div>
+                        </div>
+
+                        <div class="feedback-panel">
+                            <div class="feedback-header">
+                                <h3>Feedback Kamera</h3>
+                                <button id="toggleFeedbackCamBtn" class="toggle-camera-btn-small" title="Toggle Feedback Camera">
+                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                        <circle cx="12" cy="12" r="3"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            
+                            <div class="feedback-webcam-container" id="feedbackWebcamContainer">
+                                <video id="feedbackWebcam" class="webcam-video-small" autoplay playsinline muted></video>
+                                <canvas id="feedbackHandsCanvas" class="hands-canvas-small"></canvas>
+                            </div>
+                            
+                            <div class="feedback-text" id="feedbackText">
+                                Pilih huruf dan tunjukkan isyarat!
+                            </div>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Bottom Navigation for Mobile -->
+            <nav class="bottom-bar">
+                <button class="bottom-link active" data-page="home">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
                         <polyline points="9 22 9 12 15 12 15 22"/>
@@ -40,403 +461,35 @@
                     <span>Home</span>
                 </button>
                 
-                <button class="sidebar-link" data-page="voicetotext">
+                <button class="bottom-link" data-page="voicetotext">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M12 14C14.2091 14 16 12.2091 16 10V6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6V10C8 12.2091 9.79086 14 12 14Z"/>
                         <path d="M19 10V11C19 14.866 15.866 18 12 18C8.13401 18 5 14.866 5 11V10"/>
                         <path d="M12 18V22"/>
                         <path d="M8 22H16"/>
                     </svg>
-                    <span>Voice to Text</span>
+                    <span>Voice</span>
                 </button>
                 
-                <button class="sidebar-link" data-page="kamerakontrol">
+                <button class="bottom-link" data-page="kamerakontrol">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                         <circle cx="12" cy="12" r="3"/>
                     </svg>
-                    <span>Kamera Kontrol</span>
+                    <span>Gestur</span>
                 </button>
                 
-                <button class="sidebar-link" data-page="belajarisyarat">
+                <button class="bottom-link" data-page="belajarisyarat">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M12 19l7-7 3 3-7 7-3-3z"/>
                         <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
                         <path d="M2 2l7.586 7.586"/>
                         <circle cx="11" cy="11" r="2"/>
                     </svg>
-                    <span>Belajar Isyarat</span>
+                    <span>Belajar</span>
                 </button>
             </nav>
-
-            <div class="sidebar-footer">
-                <div class="sidebar-user">
-                    <span class="user-name" id="sidebarUserName">User</span>
-                    <span class="user-role" id="sidebarUserRole">User</span>
-                </div>
-                <button id="sidebarLogoutBtn" class="btn-logout" title="Logout">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
-                        <polyline points="16 17 21 12 16 7"/>
-                        <line x1="21" y1="12" x2="9" y2="12"/>
-                    </svg>
-                    <span>Logout</span>
-                </button>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Top Navbar for Mobile -->
-            <header class="mobile-navbar">
-                <div class="mobile-navbar-left">
-                    <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 14C14.2091 14 16 12.2091 16 10V6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6V10C8 12.2091 9.79086 14 12 14Z" stroke="#7c6dfa" stroke-width="2"/>
-                    </svg>
-                    <span>VoiceScript Ultimate</span>
-                </div>
-                <div class="mobile-navbar-right">
-                    <span class="mobile-user-name" id="mobileUserName">User</span>
-                </div>
-            </header>
-
-            <!-- Halaman 1: HOME -->
-            <section id="page-home" class="page active">
-                <div class="container">
-                    <div class="welcome-card">
-                        <h1 class="welcome-title">Selamat Datang 👋</h1>
-                        <p class="welcome-subtitle" id="welcomeUser">Mulai gunakan VoiceScript Ultimate untuk pengalaman transkripsi terbaik.</p>
-                    </div>
-
-                    <div class="stats-grid">
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <polyline points="4 17 10 11 4 5"/>
-                                    <line x1="12" y1="19" x2="20" y2="19"/>
-                                </svg>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-value" id="totalChars">0</div>
-                                <div class="stat-label">Total Karakter</div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                    <circle cx="12" cy="12" r="3"/>
-                                </svg>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-value" id="totalWords">0</div>
-                                <div class="stat-label">Total Kata</div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <circle cx="12" cy="12" r="10"/>
-                                    <polyline points="12 6 12 12 16 14"/>
-                                </svg>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-value" id="totalTranscripts">0</div>
-                                <div class="stat-label">Transkripsi</div>
-                            </div>
-                        </div>
-                        
-                        <div class="stat-card">
-                            <div class="stat-icon">
-                                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="18" y1="20" x2="18" y2="10"/>
-                                    <line x1="12" y1="20" x2="12" y2="4"/>
-                                    <line x1="6" y1="20" x2="6" y2="14"/>
-                                </svg>
-                            </div>
-                            <div class="stat-content">
-                                <div class="stat-value" id="streakDays">1</div>
-                                <div class="stat-label">Hari Berturut</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="shortcut-grid">
-                        <button class="shortcut-card" data-page="voicetotext">
-                            <span class="shortcut-icon">🎤</span>
-                            <span class="shortcut-title">Voice to Text</span>
-                            <span class="shortcut-desc">Transkripsi suara cepat</span>
-                        </button>
-                        
-                        <button class="shortcut-card" data-page="kamerakontrol">
-                            <span class="shortcut-icon">✋</span>
-                            <span class="shortcut-title">Kamera Kontrol</span>
-                            <span class="shortcut-desc">Kontrol lewat gestur</span>
-                        </button>
-                        
-                        <button class="shortcut-card" data-page="belajarisyarat">
-                            <span class="shortcut-icon">📚</span>
-                            <span class="shortcut-title">Belajar Isyarat</span>
-                            <span class="shortcut-desc">Pelajari bahasa isyarat</span>
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Halaman 2: VOICE TO TEXT -->
-            <section id="page-voicetotext" class="page">
-                <div class="container">
-                    <div class="card-header">
-                        <div class="language-selector">
-                            <label for="languageSelectVoice">Bahasa:</label>
-                            <select id="languageSelectVoice">
-                                <optgroup label="Bahasa Nusantara">
-                                    <option value="id-ID" selected>🇮🇩 Indonesia</option>
-                                    <option value="jv-ID">🇯🇼 Jawa</option>
-                                    <option value="su-ID">🇸🇩 Sunda</option>
-                                </optgroup>
-                                <optgroup label="Bahasa Asia">
-                                    <option value="en-US">🇺🇸 Inggris (US)</option>
-                                    <option value="en-GB">🇬🇧 Inggris (UK)</option>
-                                    <option value="ar-SA">🇸🇦 Arab</option>
-                                    <option value="ja-JP">🇯🇵 Jepang</option>
-                                    <option value="ko-KR">🇰🇷 Korea</option>
-                                    <option value="zh-CN">🇨🇳 Mandarin</option>
-                                    <option value="hi-IN">🇮🇳 Hindi</option>
-                                </optgroup>
-                                <optgroup label="Bahasa Eropa">
-                                    <option value="es-ES">🇪🇸 Spanyol</option>
-                                    <option value="fr-FR">🇫🇷 Prancis</option>
-                                    <option value="de-DE">🇩🇪 Jerman</option>
-                                    <option value="pt-PT">🇵🇹 Portugis</option>
-                                    <option value="it-IT">🇮🇹 Italia</option>
-                                    <option value="tr-TR">🇹🇷 Turki</option>
-                                    <option value="ru-RU">🇷🇺 Rusia</option>
-                                </optgroup>
-                            </select>
-                        </div>
-                    </div>
-
-                    <div class="status-indicator" id="voiceStatusIndicator">
-                        <span class="status-dot" id="voiceStatusDot"></span>
-                        <span id="voiceStatusText">Siap merekam. Klik tombol mic.</span>
-                    </div>
-
-                    <textarea id="voiceTranscript" class="transcript-area" placeholder="Hasil transkripsi akan muncul di sini..."></textarea>
-
-                    <div class="action-buttons">
-                        <button id="copyVoiceBtn" class="btn-secondary" title="Salin">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                            </svg>
-                            <span>Salin</span>
-                        </button>
-                        <button id="clearVoiceBtn" class="btn-secondary" title="Hapus">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="3 6 5 6 21 6"/>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                            </svg>
-                            <span>Hapus</span>
-                        </button>
-                        <button id="downloadVoiceBtn" class="btn-secondary" title="Unduh">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                <polyline points="7 10 12 15 17 10"/>
-                                <line x1="12" y1="15" x2="12" y2="3"/>
-                            </svg>
-                            <span>Unduh</span>
-                        </button>
-                        <button id="saveVoiceBtn" class="btn-primary" title="Simpan">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M19 21H5a2 2 0 0 1-2-2V7l5-5h6l5 5v12a2 2 0 0 1-2 2z"/>
-                                <polyline points="17 21 17 13 7 13 7 21"/>
-                            </svg>
-                            <span>Simpan</span>
-                        </button>
-                    </div>
-
-                    <div class="mic-container">
-                        <button id="voiceMicBtn" class="mic-button">
-                            <svg class="mic-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 14C14.2091 14 16 12.2091 16 10V6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6V10C8 12.2091 9.79086 14 12 14Z"/>
-                                <path d="M19 10V11C19 14.866 15.866 18 12 18C8.13401 18 5 14.866 5 11V10"/>
-                                <path d="M12 18V22"/>
-                                <path d="M8 22H16"/>
-                            </svg>
-                        </button>
-                        <div id="voiceMicStatus" class="mic-status">Klik untuk mulai merekam</div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Halaman 3: KAMERA KONTROL -->
-            <section id="page-kamerakontrol" class="page">
-                <div class="container">
-                    <div class="card-header">
-                        <h2 class="page-title">Kamera Kontrol</h2>
-                    </div>
-
-                    <div class="status-indicator" id="cameraStatusIndicator">
-                        <span class="status-dot" id="cameraStatusDot"></span>
-                        <span id="cameraStatusText">Klik tombol untuk menyalakan kamera.</span>
-                    </div>
-
-                    <textarea id="cameraTranscript" class="transcript-area" placeholder="Teks akan muncul ketika Anda menggunakan gestur..."></textarea>
-
-                    <div class="camera-panel">
-                        <div class="webcam-container" id="webcamContainer">
-                            <video id="webcam" class="webcam-video" autoplay playsinline muted></video>
-                            <canvas id="handsCanvas" class="hands-canvas"></canvas>
-                            <div id="cameraGestureStatus" class="gesture-status">Kamera belum aktif</div>
-                            <button id="toggleCameraBtn" class="toggle-camera-btn" title="Toggle Camera">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                    <circle cx="12" cy="12" r="3"/>
-                                </svg>
-                            </button>
-                        </div>
-                        
-                        <div class="gesture-guide">
-                            <h3>Panduan Gestur</h3>
-                            <div class="gesture-item">
-                                <span class="gesture-emoji">👍</span>
-                                <span class="gesture-text">Jempol Atas = Mulai Merekam</span>
-                            </div>
-                            <div class="gesture-item">
-                                <span class="gesture-emoji">🖐️</span>
-                                <span class="gesture-text">Tangan Terbuka = Berhenti</span>
-                            </div>
-                            <div class="gesture-item">
-                                <span class="gesture-emoji">✊</span>
-                                <span class="gesture-text">Mengepal = Hapus Teks</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="action-buttons">
-                        <button id="copyCameraBtn" class="btn-secondary" title="Salin">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
-                                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
-                            </svg>
-                            <span>Salin</span>
-                        </button>
-                        <button id="clearCameraBtn" class="btn-secondary" title="Hapus">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <polyline points="3 6 5 6 21 6"/>
-                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
-                            </svg>
-                            <span>Hapus</span>
-                        </button>
-                        <button id="downloadCameraBtn" class="btn-secondary" title="Unduh">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
-                                <polyline points="7 10 12 15 17 10"/>
-                                <line x1="12" y1="15" x2="12" y2="3"/>
-                            </svg>
-                            <span>Unduh</span>
-                        </button>
-                        <button id="saveCameraBtn" class="btn-primary" title="Simpan">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M19 21H5a2 2 0 0 1-2-2V7l5-5h6l5 5v12a2 2 0 0 1-2 2z"/>
-                                <polyline points="17 21 17 13 7 13 7 21"/>
-                            </svg>
-                            <span>Simpan</span>
-                        </button>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Halaman 4: BELAJAR ISYARAT -->
-            <section id="page-belajarisyarat" class="page">
-                <div class="container">
-                    <div class="card-header">
-                        <h2 class="page-title">Belajar Bahasa Isyarat</h2>
-                    </div>
-
-                    <div class="lesson-selector">
-                        <button class="lesson-btn active" data-lesson="alphabet">Alfabet A-Z</button>
-                        <button class="lesson-btn" data-lesson="numbers">Angka 0-10</button>
-                        <button class="lesson-btn" data-lesson="greetings">Sapaan</button>
-                    </div>
-
-                    <div id="lessonContent" class="lesson-content">
-                        <div class="lesson-grid" id="alphabetGrid">
-                            <!-- Alfabet akan di-generate oleh JS -->
-                        </div>
-                        <div class="lesson-grid hidden" id="numbersGrid">
-                            <!-- Angka akan di-generate oleh JS -->
-                        </div>
-                        <div class="lesson-grid hidden" id="greetingsGrid">
-                            <!-- Sapaan akan di-generate oleh JS -->
-                        </div>
-                    </div>
-
-                    <div class="feedback-panel">
-                        <div class="feedback-header">
-                            <h3>Feedback Kamera</h3>
-                            <button id="toggleFeedbackCamBtn" class="toggle-camera-btn-small" title="Toggle Feedback Camera">
-                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                    <circle cx="12" cy="12" r="3"/>
-                                </svg>
-                            </button>
-                        </div>
-                        
-                        <div class="feedback-webcam-container" id="feedbackWebcamContainer">
-                            <video id="feedbackWebcam" class="webcam-video-small" autoplay playsinline muted></video>
-                            <canvas id="feedbackHandsCanvas" class="hands-canvas-small"></canvas>
-                        </div>
-                        
-                        <div class="feedback-text" id="feedbackText">
-                            Pilih huruf dan tunjukkan isyarat!
-                        </div>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <!-- Bottom Navigation for Mobile -->
-        <nav class="bottom-bar">
-            <button class="bottom-link active" data-page="home">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
-                    <polyline points="9 22 9 12 15 12 15 22"/>
-                </svg>
-                <span>Home</span>
-            </button>
-            
-            <button class="bottom-link" data-page="voicetotext">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 14C14.2091 14 16 12.2091 16 10V6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6V10C8 12.2091 9.79086 14 12 14Z"/>
-                    <path d="M19 10V11C19 14.866 15.866 18 12 18C8.13401 18 5 14.866 5 11V10"/>
-                    <path d="M12 18V22"/>
-                    <path d="M8 22H16"/>
-                </svg>
-                <span>Voice</span>
-            </button>
-            
-            <button class="bottom-link" data-page="kamerakontrol">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                    <circle cx="12" cy="12" r="3"/>
-                </svg>
-                <span>Gestur</span>
-            </button>
-            
-            <button class="bottom-link" data-page="belajarisyarat">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M12 19l7-7 3 3-7 7-3-3z"/>
-                    <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"/>
-                    <path d="M2 2l7.586 7.586"/>
-                    <circle cx="11" cy="11" r="2"/>
-                </svg>
-                <span>Belajar</span>
-            </button>
-        </nav>
+        </div>
     </div>
 
     <script src="js/app.js"></script>
