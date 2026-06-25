@@ -1535,7 +1535,12 @@
             hands: null,
             feedbackHands: null,
             currentLesson: 'alphabet',
-            selectedLessonItem: null
+            selectedLessonItem: null,
+            
+            // Gesture debouncing state
+            lastPredictedGesture: null,
+            gestureConfidenceCounter: 0,
+            MIN_GESTURE_CONSISTENCY_FRAMES: 6 // Require 6 consistent frames before accepting
         };
 
         // Lesson Data
@@ -1905,10 +1910,10 @@
                     locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
                 });
                 STATE.hands.setOptions({
-                    maxNumHands: 1,
-                    modelComplexity: 0,
-                    minDetectionConfidence: 0.7,
-                    minTrackingConfidence: 0.5
+                    maxNumHands: 1, // Focus only on 1 primary hand
+                    modelComplexity: 1, // Higher complexity for better accuracy
+                    minDetectionConfidence: 0.8, // High threshold to be sure it's a hand
+                    minTrackingConfidence: 0.8 // Stable landmark tracking
                 });
                 STATE.hands.onResults(onHandsResults);
             } catch (e) {
@@ -1923,10 +1928,10 @@
                     locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
                 });
                 STATE.feedbackHands.setOptions({
-                    maxNumHands: 1,
-                    modelComplexity: 0,
-                    minDetectionConfidence: 0.7,
-                    minTrackingConfidence: 0.5
+                    maxNumHands: 1, // Focus only on 1 primary hand
+                    modelComplexity: 1, // Higher complexity for better accuracy
+                    minDetectionConfidence: 0.8, // High threshold to be sure it's a hand
+                    minTrackingConfidence: 0.8 // Stable landmark tracking
                 });
                 STATE.feedbackHands.onResults(onFeedbackHandsResults);
             } catch (e) {
@@ -1941,36 +1946,78 @@
             canvasCtx.save();
             canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (results.multiHandLandmarks) {
-                for (const landmarks of results.multiHandLandmarks) {
-                    if (window.drawConnectors) drawConnectors(canvasCtx, landmarks, window.HAND_CONNECTIONS, { color: '#7c6dfa', lineWidth: 2 });
-                    if (window.drawLandmarks) drawLandmarks(canvasCtx, landmarks, { color: '#ffffff', lineWidth: 1, radius: 3 });
-                    const gesture = detectGesture(landmarks);
+            const detectedCharEl = document.getElementById('detectedChar');
+            const detectedLabelEl = document.getElementById('detectedLabel');
+
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                const landmarks = results.multiHandLandmarks[0]; // Only take first hand
+                
+                if (window.drawConnectors) drawConnectors(canvasCtx, landmarks, window.HAND_CONNECTIONS, { color: '#7c6dfa', lineWidth: 2 });
+                if (window.drawLandmarks) drawLandmarks(canvasCtx, landmarks, { color: '#ffffff', lineWidth: 1, radius: 3 });
+                
+                const gesture = detectGesture(landmarks);
+                
+                if (gesture) {
+                    // Create a string key for gesture (for comparison)
+                    const currentGestureKey = `${gesture.type}:${gesture.value}`;
                     
-                    // Update display
-                    const detectedCharEl = document.getElementById('detectedChar');
-                    const detectedLabelEl = document.getElementById('detectedLabel');
-                    
-                    if (gesture) {
+                    // Debouncing logic
+                    if (STATE.lastPredictedGesture === currentGestureKey) {
+                        STATE.gestureConfidenceCounter++;
+                        
+                        // Only accept after consistent detections
+                        if (STATE.gestureConfidenceCounter >= STATE.MIN_GESTURE_CONSISTENCY_FRAMES) {
+                            // Update display
+                            if (gesture.type === 'letter') {
+                                if (detectedCharEl) detectedCharEl.textContent = gesture.value;
+                                if (detectedLabelEl) detectedLabelEl.textContent = 'Huruf BISINDO';
+                                handleGesture(gesture);
+                            } else if (gesture.type === 'word') {
+                                if (detectedCharEl) detectedCharEl.textContent = gesture.value;
+                                if (detectedLabelEl) detectedLabelEl.textContent = 'Kata BISINDO';
+                                handleGesture(gesture);
+                            } else if (gesture.type === 'control') {
+                                if (detectedCharEl) detectedCharEl.textContent = gesture.value === 'thumbsup' ? '👍' : gesture.value === 'open' ? '🖐️' : '✊';
+                                if (detectedLabelEl) detectedLabelEl.textContent = 'Kontrol';
+                                handleGesture(gesture);
+                            }
+                            
+                            // Reset counter after accepting
+                            STATE.gestureConfidenceCounter = 0;
+                            STATE.lastPredictedGesture = null;
+                        }
+                    } else {
+                        // New gesture detected, reset counter
+                        STATE.lastPredictedGesture = currentGestureKey;
+                        STATE.gestureConfidenceCounter = 1;
+                        
+                        // Update display immediately (just for preview)
                         if (gesture.type === 'letter') {
                             if (detectedCharEl) detectedCharEl.textContent = gesture.value;
                             if (detectedLabelEl) detectedLabelEl.textContent = 'Huruf BISINDO';
-                            handleGesture(gesture);
                         } else if (gesture.type === 'word') {
                             if (detectedCharEl) detectedCharEl.textContent = gesture.value;
                             if (detectedLabelEl) detectedLabelEl.textContent = 'Kata BISINDO';
-                            handleGesture(gesture);
                         } else if (gesture.type === 'control') {
                             if (detectedCharEl) detectedCharEl.textContent = gesture.value === 'thumbsup' ? '👍' : gesture.value === 'open' ? '🖐️' : '✊';
                             if (detectedLabelEl) detectedLabelEl.textContent = 'Kontrol';
-                            handleGesture(gesture);
                         }
-                    } else {
-                        if (detectedCharEl) detectedCharEl.textContent = '-';
-                        if (detectedLabelEl) detectedLabelEl.textContent = 'Isyarat terdeteksi';
                     }
+                } else {
+                    // No gesture detected
+                    STATE.lastPredictedGesture = null;
+                    STATE.gestureConfidenceCounter = 0;
+                    if (detectedCharEl) detectedCharEl.textContent = '-';
+                    if (detectedLabelEl) detectedLabelEl.textContent = 'Isyarat terdeteksi';
                 }
+            } else {
+                // No hands detected at all
+                STATE.lastPredictedGesture = null;
+                STATE.gestureConfidenceCounter = 0;
+                if (detectedCharEl) detectedCharEl.textContent = '-';
+                if (detectedLabelEl) detectedLabelEl.textContent = 'Kamera aktif, posisikan tangan Anda...';
             }
+            
             canvasCtx.restore();
         }
 
@@ -1981,11 +2028,18 @@
             canvasCtx.save();
             canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
 
-            if (results.multiHandLandmarks) {
-                for (const landmarks of results.multiHandLandmarks) {
-                    if (window.drawConnectors) drawConnectors(canvasCtx, landmarks, window.HAND_CONNECTIONS, { color: '#7c6dfa', lineWidth: 2 });
-                    if (window.drawLandmarks) drawLandmarks(canvasCtx, landmarks, { color: '#ffffff', lineWidth: 1, radius: 3 });
-                    checkLessonFeedback(landmarks);
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                const landmarks = results.multiHandLandmarks[0]; // Only take first hand
+                if (window.drawConnectors) drawConnectors(canvasCtx, landmarks, window.HAND_CONNECTIONS, { color: '#7c6dfa', lineWidth: 2 });
+                if (window.drawLandmarks) drawLandmarks(canvasCtx, landmarks, { color: '#ffffff', lineWidth: 1, radius: 3 });
+                checkLessonFeedback(landmarks);
+            } else {
+                // No hands detected, reset feedback text if needed
+                const feedbackText = document.getElementById('feedbackText');
+                if (feedbackText && !STATE.selectedLessonItem) {
+                    feedbackText.textContent = 'Pilih huruf dan tunjukkan isyarat!';
+                } else if (feedbackText && STATE.selectedLessonItem) {
+                    feedbackText.textContent = `Coba lagi untuk "${STATE.selectedLessonItem}"`;
                 }
             }
             canvasCtx.restore();
