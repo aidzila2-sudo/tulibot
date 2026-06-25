@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>VoiceScript Ultimate</title>
-    <link rel="stylesheet" href="css/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -12,21 +11,958 @@
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
     <style>
-        /* PERBAIKAN STATE AWAL & VISIBILITAS HALAMAN */
-        #appSection {
-            display: none;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
-        #loginSection {
+
+        :root {
+            --bg-primary: #07070f;
+            --bg-secondary: #0f0f1a;
+            --bg-tertiary: #151525;
+            --accent-primary: #7c6dfa;
+            --accent-secondary: #a78bfa;
+            --accent-danger: #ef4444;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --border-color: #1e293b;
+            --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            --font-mono: 'Space Mono', monospace;
+        }
+
+        body {
+            font-family: var(--font-sans);
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            line-height: 1.6;
+        }
+
+        /* Login Page */
+        #loginPage {
             display: flex;
             justify-content: center;
             align-items: center;
             min-height: 100vh;
+            padding: 24px;
+        }
+
+        .login-container {
+            width: 100%;
+            max-width: 420px;
+        }
+
+        .login-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 32px;
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .login-header .logo {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .login-header .logo h1 {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        .login-header .tagline {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .login-form {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-group label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .form-group input {
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(124, 109, 250, 0.15);
+        }
+
+        .error-message {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-danger);
+            padding: 12px 16px;
+            border-radius: 10px;
+            font-size: 14px;
+            text-align: center;
+            display: none;
+        }
+
+        .login-info {
+            margin-top: 24px;
+            padding-top: 24px;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+        }
+
+        .login-info p {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .login-info .demo-cred {
+            margin-top: 8px;
+            font-family: var(--font-mono);
+            font-size: 12px;
+            color: var(--accent-primary);
+        }
+
+        /* App Section */
+        #appPage {
+            display: none;
+        }
+
+        /* App Wrapper */
+        .app-wrapper {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            position: fixed;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 100;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .sidebar-brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 14px 16px;
+            border-radius: 12px;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-link:hover {
+            background: var(--bg-tertiary);
+            color: var(--accent-primary);
+        }
+
+        .sidebar-link.active {
+            background: linear-gradient(135deg, rgba(124, 109, 250, 0.15) 0%, rgba(124, 109, 250, 0.05) 100%);
+            color: var(--accent-primary);
+            border: 1px solid rgba(124, 109, 250, 0.2);
+        }
+
+        .sidebar-footer {
+            padding: 16px;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .sidebar-user {
+            margin-bottom: 12px;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 14px;
+            display: block;
+        }
+
+        .user-role {
+            font-size: 12px;
+            color: var(--accent-primary);
+            background: rgba(124, 109, 250, 0.1);
+            padding: 4px 8px;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 4px;
+        }
+
+        .btn-logout {
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            background: transparent;
+            border: 1px solid var(--border-color);
+            padding: 10px 16px;
+            border-radius: 10px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .btn-logout:hover {
+            border-color: var(--accent-danger);
+            color: var(--accent-danger);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: 280px;
+            padding: 24px;
+            padding-bottom: 100px;
+            overflow-y: auto;
+        }
+
+        /* Mobile Navbar */
+        .mobile-navbar {
+            display: none;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 16px 24px;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .mobile-navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--accent-primary);
+        }
+
+        .mobile-navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        /* Pages */
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* Welcome Card */
+        .welcome-card {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-tertiary) 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 32px;
+            margin-bottom: 24px;
+            text-align: center;
+        }
+
+        .welcome-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--accent-secondary) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .welcome-subtitle {
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .stat-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            background: rgba(124, 109, 250, 0.1);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--accent-primary);
+        }
+
+        .stat-content {
+            flex: 1;
+        }
+
+        .stat-value {
+            font-family: var(--font-mono);
+            font-size: 28px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        /* Shortcut Grid */
+        .shortcut-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 16px;
+        }
+
+        .shortcut-card {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .shortcut-card:hover {
+            border-color: var(--accent-primary);
+            transform: translateY(-4px);
+            box-shadow: 0 10px 40px rgba(124, 109, 250, 0.15);
+        }
+
+        .shortcut-icon {
+            font-size: 48px;
+        }
+
+        .shortcut-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .shortcut-desc {
+            font-size: 13px;
+            color: var(--text-secondary);
+            text-align: center;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            padding: 14px 24px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-family: var(--font-sans);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(124, 109, 250, 0.35);
+        }
+
+        .btn-secondary {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        /* Voice Page */
+        .card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .language-selector {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .language-selector label {
+            font-size: 14px;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .language-selector select {
+            padding: 10px 14px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            cursor: pointer;
+            min-width: 200px;
+        }
+
+        .language-selector select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(124, 109, 250, 0.15);
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+        }
+
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+
+        .status-dot.recording {
+            background: var(--accent-danger);
+            animation: pulseDot 1s ease-in-out infinite;
+            box-shadow: 0 0 10px rgba(239, 68, 68, 0.6);
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+
+        .transcript-area {
+            width: 100%;
+            min-height: 350px;
+            padding: 20px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 16px;
+            line-height: 1.8;
+            resize: vertical;
+            margin-bottom: 24px;
+        }
+
+        .transcript-area:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .mic-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 16px;
+            margin-top: 24px;
+        }
+
+        .mic-button {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            background: var(--accent-primary);
+            border: none;
+            color: white;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 30px rgba(124, 109, 250, 0.45);
+        }
+
+        .mic-button:hover {
+            transform: scale(1.05);
+        }
+
+        .mic-button.recording {
+            background: var(--accent-danger);
+            animation: pulseMic 1.2s ease-in-out infinite;
+            box-shadow: 0 4px 30px rgba(239, 68, 68, 0.5);
+        }
+
+        @keyframes pulseMic {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+            }
+            50% {
+                transform: scale(1.1);
+                box-shadow: 0 0 0 20px rgba(239, 68, 68, 0);
+            }
+        }
+
+        .mic-status {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Camera Page */
+        .camera-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .webcam-container {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .webcam-video {
+            width: 100%;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            transform: scaleX(-1);
+            display: block;
+        }
+
+        .hands-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform: scaleX(-1);
+        }
+
+        .gesture-status {
+            background: rgba(7, 7, 15, 0.95);
+            padding: 12px 16px;
+            font-size: 13px;
+            text-align: center;
+            color: var(--text-primary);
+            border-top: 1px solid var(--border-color);
+            font-weight: 500;
+        }
+
+        .gesture-status.detected {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            animation: glow 0.5s ease-in-out;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: inset 0 0 20px rgba(124, 109, 250, 0.3); }
+            50% { box-shadow: inset 0 0 40px rgba(124, 109, 250, 0.6); }
+        }
+
+        .toggle-camera-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: rgba(7, 7, 15, 0.95);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+            z-index: 2;
+        }
+
+        .toggle-camera-btn:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+            transform: scale(1.1);
+        }
+
+        .gesture-guide {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px;
+        }
+
+        .gesture-guide h3 {
+            font-size: 16px;
+            margin-bottom: 20px;
+            color: var(--accent-primary);
+        }
+
+        .gesture-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 14px 0;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .gesture-item:last-child {
+            border-bottom: none;
+        }
+
+        .gesture-emoji {
+            font-size: 28px;
+            width: 44px;
+            text-align: center;
+        }
+
+        .gesture-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        /* Lesson Page */
+        .lesson-selector {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 24px;
+            flex-wrap: wrap;
+        }
+
+        .lesson-btn {
+            padding: 10px 20px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-secondary);
+            font-family: var(--font-sans);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .lesson-btn:hover,
+        .lesson-btn.active {
+            background: var(--accent-primary);
+            color: white;
+            border-color: var(--accent-primary);
+        }
+
+        .lesson-content {
+            margin-bottom: 24px;
+        }
+
+        .lesson-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            gap: 12px;
+        }
+
+        .lesson-grid.hidden {
+            display: none;
+        }
+
+        .lesson-item {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 16px 12px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .lesson-item:hover {
+            border-color: var(--accent-primary);
+        }
+
+        .lesson-item.active {
+            border-color: var(--accent-primary);
+            background: rgba(124, 109, 250, 0.1);
+        }
+
+        .lesson-item span {
+            display: block;
+            font-weight: 700;
+            font-size: 24px;
+            margin-bottom: 4px;
+        }
+
+        .lesson-item small {
+            color: var(--text-secondary);
+            font-size: 12px;
+        }
+
+        .feedback-panel {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 24px;
+        }
+
+        .feedback-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+        }
+
+        .feedback-header h3 {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--accent-primary);
+        }
+
+        .toggle-camera-btn-small {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            color: var(--text-secondary);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-camera-btn-small:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .feedback-webcam-container {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .webcam-video-small {
+            width: 100%;
+            aspect-ratio: 4/3;
+            object-fit: cover;
+            transform: scaleX(-1);
+            display: block;
+        }
+
+        .hands-canvas-small {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform: scaleX(-1);
+        }
+
+        .feedback-text {
+            text-align: center;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border-radius: 10px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .feedback-text.correct {
+            background: rgba(16, 185, 129, 0.1);
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .feedback-text.incorrect {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-danger);
+            font-weight: 600;
+        }
+
+        /* Bottom Navigation */
+        .bottom-bar {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-secondary);
+            border-top: 1px solid var(--border-color);
+            padding: 8px 0;
+            z-index: 100;
+        }
+
+        .bottom-link {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            padding: 8px;
+            color: var(--text-secondary);
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            font-size: 11px;
+            font-family: var(--font-sans);
+            transition: all 0.3s ease;
+        }
+
+        .bottom-link.active,
+        .bottom-link:hover {
+            color: var(--accent-primary);
+        }
+
+        /* Responsive Styles */
+        @media (max-width: 1024px) {
+            .sidebar {
+                display: none;
+            }
+            .main-content {
+                margin-left: 0;
+                padding-top: 0;
+            }
+            .mobile-navbar {
+                display: flex;
+            }
+            .bottom-bar {
+                display: flex;
+            }
+            .card-header {
+                flex-direction: column;
+                align-items: stretch;
+            }
+            .action-buttons {
+                justify-content: center;
+            }
+            .btn-secondary span,
+            .btn-primary span {
+                display: none;
+            }
+            .welcome-title {
+                font-size: 24px;
+            }
+            .shortcut-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (min-width: 1025px) {
+            .mobile-navbar {
+                display: none;
+            }
         }
     </style>
 </head>
 <body>
-    <!-- LOGIN PAGE SECTION -->
-    <div id="loginSection" class="login-page">
+    <!-- Login Page -->
+    <div id="loginPage">
         <div class="login-container">
             <div class="login-card">
                 <div class="login-header">
@@ -41,23 +977,23 @@
                     </div>
                     <p class="tagline">Speak to Text with Touchless Gesture Control</p>
                 </div>
-                
+
                 <form id="loginForm" class="login-form">
                     <div class="form-group">
                         <label for="email">Email / Username</label>
                         <input type="text" id="email" name="email" required placeholder="Masukkan email atau username">
                     </div>
-                    
+
                     <div class="form-group">
                         <label for="password">Password</label>
                         <input type="password" id="password" name="password" required placeholder="Masukkan password">
                     </div>
-                    
-                    <div id="loginError" class="error-message" style="display: none;"></div>
-                    
+
+                    <div id="loginError" class="error-message"></div>
+
                     <button type="submit" class="btn-primary">Login</button>
                 </form>
-                
+
                 <div class="login-info">
                     <p>Akun Demo:</p>
                     <p class="demo-cred">admin@voicescript.com | password</p>
@@ -66,10 +1002,10 @@
         </div>
     </div>
 
-    <!-- MAIN APP SECTION -->
-    <div id="appSection">
+    <!-- Main App Page -->
+    <div id="appPage">
         <div class="app-wrapper">
-            <!-- Sidebar for Desktop -->
+            <!-- Sidebar -->
             <aside class="sidebar">
                 <div class="sidebar-header">
                     <div class="sidebar-brand">
@@ -91,7 +1027,6 @@
                         </svg>
                         <span>Home</span>
                     </button>
-                    
                     <button class="sidebar-link" data-page="voicetotext">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M12 14C14.2091 14 16 12.2091 16 10V6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6V10C8 12.2091 9.79086 14 12 14Z"/>
@@ -101,7 +1036,6 @@
                         </svg>
                         <span>Voice to Text</span>
                     </button>
-                    
                     <button class="sidebar-link" data-page="kamerakontrol">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
@@ -109,7 +1043,6 @@
                         </svg>
                         <span>Kamera Kontrol</span>
                     </button>
-                    
                     <button class="sidebar-link" data-page="belajarisyarat">
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M12 19l7-7 3 3-7 7-3-3z"/>
@@ -126,7 +1059,7 @@
                         <span class="user-name" id="sidebarUserName">User</span>
                         <span class="user-role" id="sidebarUserRole">User</span>
                     </div>
-                    <button id="sidebarLogoutBtn" class="btn-logout" title="Logout">
+                    <button id="sidebarLogoutBtn" class="btn-logout">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
                             <polyline points="16 17 21 12 16 7"/>
@@ -139,7 +1072,6 @@
 
             <!-- Main Content -->
             <main class="main-content">
-                <!-- Top Navbar for Mobile -->
                 <header class="mobile-navbar">
                     <div class="mobile-navbar-left">
                         <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -152,14 +1084,13 @@
                     </div>
                 </header>
 
-                <!-- Halaman 1: HOME -->
+                <!-- Home Page -->
                 <section id="page-home" class="page active">
                     <div class="container">
                         <div class="welcome-card">
                             <h1 class="welcome-title">Selamat Datang 👋</h1>
                             <p class="welcome-subtitle" id="welcomeUser">Mulai gunakan VoiceScript Ultimate untuk pengalaman transkripsi terbaik.</p>
                         </div>
-
                         <div class="stats-grid">
                             <div class="stat-card">
                                 <div class="stat-icon">
@@ -173,7 +1104,6 @@
                                     <div class="stat-label">Total Karakter</div>
                                 </div>
                             </div>
-                            
                             <div class="stat-card">
                                 <div class="stat-icon">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -186,7 +1116,6 @@
                                     <div class="stat-label">Total Kata</div>
                                 </div>
                             </div>
-                            
                             <div class="stat-card">
                                 <div class="stat-icon">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -199,7 +1128,6 @@
                                     <div class="stat-label">Transkripsi</div>
                                 </div>
                             </div>
-                            
                             <div class="stat-card">
                                 <div class="stat-icon">
                                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -214,20 +1142,17 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="shortcut-grid">
                             <button class="shortcut-card" data-page="voicetotext">
                                 <span class="shortcut-icon">🎤</span>
                                 <span class="shortcut-title">Voice to Text</span>
                                 <span class="shortcut-desc">Transkripsi suara cepat</span>
                             </button>
-                            
                             <button class="shortcut-card" data-page="kamerakontrol">
                                 <span class="shortcut-icon">✋</span>
                                 <span class="shortcut-title">Kamera Kontrol</span>
                                 <span class="shortcut-desc">Kontrol lewat gestur</span>
                             </button>
-                            
                             <button class="shortcut-card" data-page="belajarisyarat">
                                 <span class="shortcut-icon">📚</span>
                                 <span class="shortcut-title">Belajar Isyarat</span>
@@ -237,63 +1162,41 @@
                     </div>
                 </section>
 
-                <!-- Halaman 2: VOICE TO TEXT -->
+                <!-- Voice to Text Page -->
                 <section id="page-voicetotext" class="page">
                     <div class="container">
                         <div class="card-header">
                             <div class="language-selector">
                                 <label for="languageSelectVoice">Bahasa:</label>
                                 <select id="languageSelectVoice">
-                                    <optgroup label="Bahasa Nusantara">
-                                        <option value="id-ID" selected>🇮🇩 Indonesia</option>
-                                        <option value="jv-ID">🇯🇼 Jawa</option>
-                                        <option value="su-ID">🇸🇩 Sunda</option>
-                                    </optgroup>
-                                    <optgroup label="Bahasa Asia">
-                                        <option value="en-US">🇺🇸 Inggris (US)</option>
-                                        <option value="en-GB">🇬🇧 Inggris (UK)</option>
-                                        <option value="ar-SA">🇸🇦 Arab</option>
-                                        <option value="ja-JP">🇯🇵 Jepang</option>
-                                        <option value="ko-KR">🇰🇷 Korea</option>
-                                        <option value="zh-CN">🇨🇳 Mandarin</option>
-                                        <option value="hi-IN">🇮🇳 Hindi</option>
-                                    </optgroup>
-                                    <optgroup label="Bahasa Eropa">
-                                        <option value="es-ES">🇪🇸 Spanyol</option>
-                                        <option value="fr-FR">🇫🇷 Prancis</option>
-                                        <option value="de-DE">🇩🇪 Jerman</option>
-                                        <option value="pt-PT">🇵🇹 Portugis</option>
-                                        <option value="it-IT">🇮🇹 Italia</option>
-                                        <option value="tr-TR">🇹🇷 Turki</option>
-                                        <option value="ru-RU">🇷🇺 Rusia</option>
-                                    </optgroup>
+                                    <option value="id-ID" selected>🇮🇩 Indonesia</option>
+                                    <option value="en-US">🇺🇸 Inggris (US)</option>
+                                    <option value="ja-JP">🇯🇵 Jepang</option>
+                                    <option value="ko-KR">🇰🇷 Korea</option>
                                 </select>
                             </div>
                         </div>
-
                         <div class="status-indicator" id="voiceStatusIndicator">
                             <span class="status-dot" id="voiceStatusDot"></span>
                             <span id="voiceStatusText">Siap merekam. Klik tombol mic.</span>
                         </div>
-
                         <textarea id="voiceTranscript" class="transcript-area" placeholder="Hasil transkripsi akan muncul di sini..."></textarea>
-
                         <div class="action-buttons">
-                            <button id="copyVoiceBtn" class="btn-secondary" title="Salin">
+                            <button id="copyVoiceBtn" class="btn-secondary">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
                                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
                                 </svg>
                                 <span>Salin</span>
                             </button>
-                            <button id="clearVoiceBtn" class="btn-secondary" title="Hapus">
+                            <button id="clearVoiceBtn" class="btn-secondary">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <polyline points="3 6 5 6 21 6"/>
                                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
                                 </svg>
                                 <span>Hapus</span>
                             </button>
-                            <button id="downloadVoiceBtn" class="btn-secondary" title="Unduh">
+                            <button id="downloadVoiceBtn" class="btn-secondary">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                                     <polyline points="7 10 12 15 17 10"/>
@@ -301,7 +1204,7 @@
                                 </svg>
                                 <span>Unduh</span>
                             </button>
-                            <button id="saveVoiceBtn" class="btn-primary" title="Simpan">
+                            <button id="saveVoiceBtn" class="btn-primary">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M19 21H5a2 2 0 0 1-2-2V7l5-5h6l5 5v12a2 2 0 0 1-2 2z"/>
                                     <polyline points="17 21 17 13 7 13 7 21"/>
@@ -309,7 +1212,6 @@
                                 <span>Simpan</span>
                             </button>
                         </div>
-
                         <div class="mic-container">
                             <button id="voiceMicBtn" class="mic-button">
                                 <svg class="mic-icon" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -324,33 +1226,29 @@
                     </div>
                 </section>
 
-                <!-- Halaman 3: KAMERA KONTROL -->
+                <!-- Camera Control Page -->
                 <section id="page-kamerakontrol" class="page">
                     <div class="container">
                         <div class="card-header">
                             <h2 class="page-title">Kamera Kontrol</h2>
                         </div>
-
                         <div class="status-indicator" id="cameraStatusIndicator">
                             <span class="status-dot" id="cameraStatusDot"></span>
                             <span id="cameraStatusText">Klik tombol untuk menyalakan kamera.</span>
                         </div>
-
                         <textarea id="cameraTranscript" class="transcript-area" placeholder="Teks akan muncul ketika Anda menggunakan gestur..."></textarea>
-
                         <div class="camera-panel">
                             <div class="webcam-container" id="webcamContainer">
                                 <video id="webcam" class="webcam-video" autoplay playsinline muted></video>
                                 <canvas id="handsCanvas" class="hands-canvas"></canvas>
                                 <div id="cameraGestureStatus" class="gesture-status">Kamera belum aktif</div>
-                                <button id="toggleCameraBtn" class="toggle-camera-btn" title="Toggle Camera">
+                                <button id="toggleCameraBtn" class="toggle-camera-btn">
                                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                                         <circle cx="12" cy="12" r="3"/>
                                     </svg>
                                 </button>
                             </div>
-                            
                             <div class="gesture-guide">
                                 <h3>Panduan Gestur</h3>
                                 <div class="gesture-item">
@@ -367,23 +1265,22 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="action-buttons">
-                            <button id="copyCameraBtn" class="btn-secondary" title="Salin">
+                            <button id="copyCameraBtn" class="btn-secondary">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
                                     <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
                                 </svg>
                                 <span>Salin</span>
                             </button>
-                            <button id="clearCameraBtn" class="btn-secondary" title="Hapus">
+                            <button id="clearCameraBtn" class="btn-secondary">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <polyline points="3 6 5 6 21 6"/>
                                     <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
                                 </svg>
                                 <span>Hapus</span>
                             </button>
-                            <button id="downloadCameraBtn" class="btn-secondary" title="Unduh">
+                            <button id="downloadCameraBtn" class="btn-secondary">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
                                     <polyline points="7 10 12 15 17 10"/>
@@ -391,7 +1288,7 @@
                                 </svg>
                                 <span>Unduh</span>
                             </button>
-                            <button id="saveCameraBtn" class="btn-primary" title="Simpan">
+                            <button id="saveCameraBtn" class="btn-primary">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                     <path d="M19 21H5a2 2 0 0 1-2-2V7l5-5h6l5 5v12a2 2 0 0 1-2 2z"/>
                                     <polyline points="17 21 17 13 7 13 7 21"/>
@@ -402,56 +1299,43 @@
                     </div>
                 </section>
 
-                <!-- Halaman 4: BELAJAR ISYARAT -->
+                <!-- Learn Sign Language Page -->
                 <section id="page-belajarisyarat" class="page">
                     <div class="container">
                         <div class="card-header">
                             <h2 class="page-title">Belajar Bahasa Isyarat</h2>
                         </div>
-
                         <div class="lesson-selector">
                             <button class="lesson-btn active" data-lesson="alphabet">Alfabet A-Z</button>
                             <button class="lesson-btn" data-lesson="numbers">Angka 0-10</button>
                             <button class="lesson-btn" data-lesson="greetings">Sapaan</button>
                         </div>
-
                         <div id="lessonContent" class="lesson-content">
-                            <div class="lesson-grid" id="alphabetGrid">
-                                <!-- Alfabet akan di-generate oleh JS -->
-                            </div>
-                            <div class="lesson-grid hidden" id="numbersGrid">
-                                <!-- Angka akan di-generate oleh JS -->
-                            </div>
-                            <div class="lesson-grid hidden" id="greetingsGrid">
-                                <!-- Sapaan akan di-generate oleh JS -->
-                            </div>
+                            <div class="lesson-grid" id="alphabetGrid"></div>
+                            <div class="lesson-grid hidden" id="numbersGrid"></div>
+                            <div class="lesson-grid hidden" id="greetingsGrid"></div>
                         </div>
-
                         <div class="feedback-panel">
                             <div class="feedback-header">
                                 <h3>Feedback Kamera</h3>
-                                <button id="toggleFeedbackCamBtn" class="toggle-camera-btn-small" title="Toggle Feedback Camera">
+                                <button id="toggleFeedbackCamBtn" class="toggle-camera-btn-small">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
                                         <circle cx="12" cy="12" r="3"/>
                                     </svg>
                                 </button>
                             </div>
-                            
                             <div class="feedback-webcam-container" id="feedbackWebcamContainer">
                                 <video id="feedbackWebcam" class="webcam-video-small" autoplay playsinline muted></video>
                                 <canvas id="feedbackHandsCanvas" class="hands-canvas-small"></canvas>
                             </div>
-                            
-                            <div class="feedback-text" id="feedbackText">
-                                Pilih huruf dan tunjukkan isyarat!
-                            </div>
+                            <div class="feedback-text" id="feedbackText">Pilih huruf dan tunjukkan isyarat!</div>
                         </div>
                     </div>
                 </section>
             </main>
 
-            <!-- Bottom Navigation for Mobile -->
+            <!-- Bottom Nav -->
             <nav class="bottom-bar">
                 <button class="bottom-link active" data-page="home">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -460,7 +1344,6 @@
                     </svg>
                     <span>Home</span>
                 </button>
-                
                 <button class="bottom-link" data-page="voicetotext">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M12 14C14.2091 14 16 12.2091 16 10V6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6V10C8 12.2091 9.79086 14 12 14Z"/>
@@ -470,7 +1353,6 @@
                     </svg>
                     <span>Voice</span>
                 </button>
-                
                 <button class="bottom-link" data-page="kamerakontrol">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
@@ -478,7 +1360,6 @@
                     </svg>
                     <span>Gestur</span>
                 </button>
-                
                 <button class="bottom-link" data-page="belajarisyarat">
                     <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M12 19l7-7 3 3-7 7-3-3z"/>
@@ -492,6 +1373,646 @@
         </div>
     </div>
 
-    <script src="js/app.js"></script>
+    <script>
+        // State
+        const STATE = {
+            currentPage: 'home',
+            isRecording: false,
+            isCameraOn: false,
+            isFeedbackCameraOn: false,
+            currentLanguage: 'id-ID',
+            lastGestureTime: 0,
+            mediaStream: null,
+            feedbackMediaStream: null,
+            speechRecognition: null,
+            hands: null,
+            feedbackHands: null,
+            currentLesson: 'alphabet',
+            selectedLessonItem: null
+        };
+
+        // Lesson Data
+        const LESSON_DATA = {
+            alphabet: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'],
+            numbers: ['0','1','2','3','4','5','6','7','8','9','10'],
+            greetings: ['Halo','Selamat','Tinggal','Terima','Kasih','Maaf','Silakan']
+        };
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            attachEventListeners();
+            checkAuth();
+        });
+
+        // Event Listeners
+        function attachEventListeners() {
+            // Login Form
+            const loginForm = document.getElementById('loginForm');
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
+
+            // Logout Button
+            const logoutBtn = document.getElementById('sidebarLogoutBtn');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', handleLogout);
+            }
+
+            // Navigation Links
+            document.querySelectorAll('.sidebar-link, .bottom-link, .shortcut-card').forEach(link => {
+                link.addEventListener('click', () => {
+                    const pageId = link.dataset.page;
+                    if (pageId) switchPage(pageId);
+                });
+            });
+
+            // Voice Page
+            const langSelect = document.getElementById('languageSelectVoice');
+            if (langSelect) langSelect.addEventListener('change', (e) => { STATE.currentLanguage = e.target.value; });
+
+            const voiceMicBtn = document.getElementById('voiceMicBtn');
+            if (voiceMicBtn) voiceMicBtn.addEventListener('click', toggleRecording);
+
+            const copyVoiceBtn = document.getElementById('copyVoiceBtn');
+            if (copyVoiceBtn) copyVoiceBtn.addEventListener('click', () => copyText('voiceTranscript'));
+
+            const clearVoiceBtn = document.getElementById('clearVoiceBtn');
+            if (clearVoiceBtn) clearVoiceBtn.addEventListener('click', () => clearText('voiceTranscript'));
+
+            const downloadVoiceBtn = document.getElementById('downloadVoiceBtn');
+            if (downloadVoiceBtn) downloadVoiceBtn.addEventListener('click', () => downloadText('voiceTranscript', `voicescript-${Date.now()}.txt`));
+
+            const saveVoiceBtn = document.getElementById('saveVoiceBtn');
+            if (saveVoiceBtn) saveVoiceBtn.addEventListener('click', () => saveTranscript('voiceTranscript', 'voice'));
+
+            // Camera Page
+            const toggleCameraBtn = document.getElementById('toggleCameraBtn');
+            if (toggleCameraBtn) toggleCameraBtn.addEventListener('click', toggleCamera);
+
+            const copyCameraBtn = document.getElementById('copyCameraBtn');
+            if (copyCameraBtn) copyCameraBtn.addEventListener('click', () => copyText('cameraTranscript'));
+
+            const clearCameraBtn = document.getElementById('clearCameraBtn');
+            if (clearCameraBtn) clearCameraBtn.addEventListener('click', () => clearText('cameraTranscript'));
+
+            const downloadCameraBtn = document.getElementById('downloadCameraBtn');
+            if (downloadCameraBtn) downloadCameraBtn.addEventListener('click', () => downloadText('cameraTranscript', `voicescript-gesture-${Date.now()}.txt`));
+
+            const saveCameraBtn = document.getElementById('saveCameraBtn');
+            if (saveCameraBtn) saveCameraBtn.addEventListener('click', () => saveTranscript('cameraTranscript', 'gesture'));
+
+            // Lesson Page
+            document.querySelectorAll('.lesson-btn').forEach(btn => {
+                btn.addEventListener('click', () => switchLesson(btn.dataset.lesson));
+            });
+
+            const toggleFeedbackCamBtn = document.getElementById('toggleFeedbackCamBtn');
+            if (toggleFeedbackCamBtn) toggleFeedbackCamBtn.addEventListener('click', toggleFeedbackCamera);
+        }
+
+        // Auth
+        function checkAuth() {
+            const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+            if (isLoggedIn) {
+                showApp();
+            } else {
+                showLogin();
+            }
+        }
+
+        function showLogin() {
+            const loginPage = document.getElementById('loginPage');
+            const appPage = document.getElementById('appPage');
+            if (loginPage) loginPage.style.display = 'flex';
+            if (appPage) appPage.style.display = 'none';
+        }
+
+        function showApp() {
+            const loginPage = document.getElementById('loginPage');
+            const appPage = document.getElementById('appPage');
+            if (loginPage) loginPage.style.display = 'none';
+            if (appPage) appPage.style.display = 'block';
+            updateUserUI();
+            loadStats();
+            renderLessons();
+        }
+
+        function handleLogin(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const errorEl = document.getElementById('loginError');
+            
+            if ((email === 'admin@voicescript.com' || email === 'admin') && password === 'password') {
+                localStorage.setItem('isLoggedIn', 'true');
+                localStorage.setItem('username', 'Admin');
+                showApp();
+            } else {
+                if (errorEl) {
+                    errorEl.textContent = 'Email atau password salah!';
+                    errorEl.style.display = 'block';
+                }
+            }
+        }
+
+        function handleLogout() {
+            localStorage.removeItem('isLoggedIn');
+            localStorage.removeItem('username');
+            cleanupCurrentPage();
+            showLogin();
+        }
+
+        function updateUserUI() {
+            const username = localStorage.getItem('username') || 'User';
+            const sidebarUserName = document.getElementById('sidebarUserName');
+            const mobileUserName = document.getElementById('mobileUserName');
+            const welcomeUser = document.getElementById('welcomeUser');
+            if (sidebarUserName) sidebarUserName.textContent = username;
+            if (mobileUserName) mobileUserName.textContent = username;
+            if (welcomeUser) welcomeUser.textContent = `Selamat datang kembali, ${username}!`;
+        }
+
+        // Navigation
+        function switchPage(pageId) {
+            cleanupCurrentPage();
+            STATE.currentPage = pageId;
+
+            // Update pages
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            const targetPage = document.getElementById(`page-${pageId}`);
+            if (targetPage) targetPage.classList.add('active');
+
+            // Update nav
+            document.querySelectorAll('.sidebar-link, .bottom-link').forEach(link => {
+                link.classList.toggle('active', link.dataset.page === pageId);
+            });
+
+            if (pageId === 'belajarisyarat') renderLessons();
+        }
+
+        function cleanupCurrentPage() {
+            stopRecording();
+            stopCamera();
+            stopFeedbackCamera();
+            const feedbackText = document.getElementById('feedbackText');
+            if (feedbackText) {
+                feedbackText.classList.remove('correct', 'incorrect');
+            }
+        }
+
+        // Stats
+        function loadStats() {
+            const transcripts = JSON.parse(localStorage.getItem('voicescript_data') || '[]');
+            const totalChars = transcripts.reduce((sum, t) => sum + (t.text?.length || 0), 0);
+            const totalWords = transcripts.reduce((sum, t) => sum + (t.text?.split(/\s+/).filter(word => word.length > 0).length || 0), 0);
+
+            const totalCharsEl = document.getElementById('totalChars');
+            const totalWordsEl = document.getElementById('totalWords');
+            const totalTranscriptsEl = document.getElementById('totalTranscripts');
+            const streakDaysEl = document.getElementById('streakDays');
+
+            if (totalCharsEl) totalCharsEl.textContent = totalChars.toLocaleString();
+            if (totalWordsEl) totalWordsEl.textContent = totalWords.toLocaleString();
+            if (totalTranscriptsEl) totalTranscriptsEl.textContent = transcripts.length;
+            if (streakDaysEl) streakDaysEl.textContent = 1;
+        }
+
+        function saveTranscript(textareaId, controlMethod) {
+            const textarea = document.getElementById(textareaId);
+            if (!textarea || !textarea.value) return;
+            const transcripts = JSON.parse(localStorage.getItem('voicescript_data') || '[]');
+            transcripts.push({
+                id: Date.now(),
+                text: textarea.value,
+                control_method: controlMethod,
+                created_at: new Date().toISOString()
+            });
+            localStorage.setItem('voicescript_data', JSON.stringify(transcripts));
+            loadStats();
+        }
+
+        // Text Utils
+        function copyText(textareaId) {
+            const textarea = document.getElementById(textareaId);
+            if (!textarea || !textarea.value) return;
+            navigator.clipboard.writeText(textarea.value);
+        }
+
+        function clearText(textareaId) {
+            const textarea = document.getElementById(textareaId);
+            if (!textarea) return;
+            textarea.value = '';
+        }
+
+        function downloadText(textareaId, filename) {
+            const textarea = document.getElementById(textareaId);
+            if (!textarea || !textarea.value) return;
+            const blob = new Blob([textarea.value], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Speech Recognition
+        function initSpeechRecognition() {
+            if (STATE.speechRecognition) return;
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (!SpeechRecognition) {
+                updateVoiceStatus('Browser tidak mendukung Speech Recognition', false);
+                return;
+            }
+            STATE.speechRecognition = new SpeechRecognition();
+            STATE.speechRecognition.continuous = true;
+            STATE.speechRecognition.interimResults = true;
+            STATE.speechRecognition.lang = STATE.currentLanguage;
+            STATE.speechRecognition.onresult = (event) => {
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript;
+                }
+                const textarea = document.getElementById('voiceTranscript');
+                if (textarea) textarea.value += transcript;
+                updateVoiceStatus('Mendengarkan...', true);
+            };
+            STATE.speechRecognition.onerror = (e) => {
+                if (e.error !== 'no-speech') {
+                    updateVoiceStatus(`Error: ${e.error}`, false);
+                }
+            };
+            STATE.speechRecognition.onend = () => {
+                if (STATE.isRecording) {
+                    try { STATE.speechRecognition.start(); } catch (e) {}
+                }
+            };
+        }
+
+        function toggleRecording() {
+            if (STATE.isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        }
+
+        function startRecording() {
+            initSpeechRecognition();
+            if (!STATE.speechRecognition) return;
+            STATE.speechRecognition.lang = STATE.currentLanguage;
+            STATE.speechRecognition.start();
+            STATE.isRecording = true;
+            const voiceMicBtn = document.getElementById('voiceMicBtn');
+            if (voiceMicBtn) voiceMicBtn.classList.add('recording');
+            const voiceMicStatus = document.getElementById('voiceMicStatus');
+            if (voiceMicStatus) voiceMicStatus.textContent = 'Mendengarkan...';
+            updateVoiceStatus('Merekam suara', true);
+        }
+
+        function stopRecording() {
+            if (!STATE.speechRecognition) return;
+            try { STATE.speechRecognition.stop(); } catch (e) {}
+            STATE.isRecording = false;
+            const voiceMicBtn = document.getElementById('voiceMicBtn');
+            if (voiceMicBtn) voiceMicBtn.classList.remove('recording');
+            const voiceMicStatus = document.getElementById('voiceMicStatus');
+            if (voiceMicStatus) voiceMicStatus.textContent = 'Klik untuk mulai merekam';
+            updateVoiceStatus('Siap merekam', false);
+        }
+
+        function updateVoiceStatus(text, isActive) {
+            const voiceStatusText = document.getElementById('voiceStatusText');
+            const voiceStatusDot = document.getElementById('voiceStatusDot');
+            if (voiceStatusText) voiceStatusText.textContent = text;
+            if (voiceStatusDot) voiceStatusDot.classList.toggle('recording', isActive);
+        }
+
+        // Camera & Gesture
+        async function initHands() {
+            if (STATE.hands || !window.Hands) return;
+            try {
+                STATE.hands = new Hands({
+                    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+                });
+                STATE.hands.setOptions({
+                    maxNumHands: 1,
+                    modelComplexity: 0,
+                    minDetectionConfidence: 0.7,
+                    minTrackingConfidence: 0.5
+                });
+                STATE.hands.onResults(onHandsResults);
+            } catch (e) {
+                console.error('MediaPipe init error:', e);
+            }
+        }
+
+        async function initFeedbackHands() {
+            if (STATE.feedbackHands || !window.Hands) return;
+            try {
+                STATE.feedbackHands = new Hands({
+                    locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+                });
+                STATE.feedbackHands.setOptions({
+                    maxNumHands: 1,
+                    modelComplexity: 0,
+                    minDetectionConfidence: 0.7,
+                    minTrackingConfidence: 0.5
+                });
+                STATE.feedbackHands.onResults(onFeedbackHandsResults);
+            } catch (e) {
+                console.error('MediaPipe feedback init error:', e);
+            }
+        }
+
+        function onHandsResults(results) {
+            const canvas = document.getElementById('handsCanvas');
+            if (!canvas) return;
+            const canvasCtx = canvas.getContext('2d');
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (results.multiHandLandmarks) {
+                for (const landmarks of results.multiHandLandmarks) {
+                    if (window.drawConnectors) drawConnectors(canvasCtx, landmarks, window.HAND_CONNECTIONS, { color: '#7c6dfa', lineWidth: 2 });
+                    if (window.drawLandmarks) drawLandmarks(canvasCtx, landmarks, { color: '#ffffff', lineWidth: 1, radius: 3 });
+                    const gesture = detectGesture(landmarks);
+                    if (gesture) handleGesture(gesture);
+                }
+            }
+            canvasCtx.restore();
+        }
+
+        function onFeedbackHandsResults(results) {
+            const canvas = document.getElementById('feedbackHandsCanvas');
+            if (!canvas) return;
+            const canvasCtx = canvas.getContext('2d');
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (results.multiHandLandmarks) {
+                for (const landmarks of results.multiHandLandmarks) {
+                    if (window.drawConnectors) drawConnectors(canvasCtx, landmarks, window.HAND_CONNECTIONS, { color: '#7c6dfa', lineWidth: 2 });
+                    if (window.drawLandmarks) drawLandmarks(canvasCtx, landmarks, { color: '#ffffff', lineWidth: 1, radius: 3 });
+                    checkLessonFeedback(landmarks);
+                }
+            }
+            canvasCtx.restore();
+        }
+
+        function detectGesture(landmarks) {
+            try {
+                const thumbTip = landmarks[4];
+                const indexTip = landmarks[8];
+                const middleTip = landmarks[12];
+                const ringTip = landmarks[16];
+                const pinkyTip = landmarks[20];
+
+                const thumbUp = thumbTip.y < indexTip.y && thumbTip.y < middleTip.y;
+                const indexUp = indexTip.y < landmarks[6].y;
+                const middleUp = middleTip.y < landmarks[10].y;
+                const ringUp = ringTip.y < landmarks[14].y;
+                const pinkyUp = pinkyTip.y < landmarks[18].y;
+
+                if (thumbUp && !indexUp && !middleUp && !ringUp && !pinkyUp) return 'thumbsup';
+                if (indexUp && middleUp && ringUp && pinkyUp) return 'open';
+                if (!indexUp && !middleUp && !ringUp && !pinkyUp) return 'fist';
+            } catch (e) {
+                console.error('Detect gesture error:', e);
+            }
+            return null;
+        }
+
+        function handleGesture(gesture) {
+            const now = Date.now();
+            if (now - STATE.lastGestureTime < 1500) return;
+            STATE.lastGestureTime = now;
+
+            const statusEl = document.getElementById('cameraGestureStatus');
+            if (statusEl) {
+                statusEl.textContent = `Terdeteksi: ${gesture === 'thumbsup' ? '👍 Mulai Merekam' : gesture === 'open' ? '🖐️ Berhenti' : '✊ Hapus'}`;
+                statusEl.classList.add('detected');
+                setTimeout(() => statusEl.classList.remove('detected'), 500);
+            }
+
+            if (gesture === 'thumbsup') {
+                if (!STATE.isRecording) toggleRecordingForCamera();
+            } else if (gesture === 'open') {
+                if (STATE.isRecording) toggleRecordingForCamera();
+            } else if (gesture === 'fist') {
+                const textarea = document.getElementById('cameraTranscript');
+                if (textarea) textarea.value = '';
+            }
+        }
+
+        async function startCamera() {
+            if (STATE.isCameraOn) return;
+            await initHands();
+            try {
+                STATE.mediaStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: { ideal: 640 }, height: { ideal: 480 } }
+                });
+                const webcam = document.getElementById('webcam');
+                if (webcam) webcam.srcObject = STATE.mediaStream;
+                const canvas = document.getElementById('handsCanvas');
+                if (canvas) {
+                    canvas.width = 640;
+                    canvas.height = 480;
+                }
+                STATE.isCameraOn = true;
+                startManualFrameLoop();
+                updateCameraStatus('Kamera aktif', true);
+                const statusEl = document.getElementById('cameraGestureStatus');
+                if (statusEl) statusEl.textContent = 'Kamera aktif, tunjukkan gestur';
+            } catch (e) {
+                console.error('Start camera error:', e);
+                updateCameraStatus(`Kamera error: ${e.message}`, false);
+            }
+        }
+
+        function stopCamera() {
+            if (!STATE.isCameraOn) return;
+            if (STATE.mediaStream) {
+                STATE.mediaStream.getTracks().forEach(track => track.stop());
+                STATE.mediaStream = null;
+            }
+            const webcam = document.getElementById('webcam');
+            if (webcam) webcam.srcObject = null;
+            STATE.isCameraOn = false;
+            updateCameraStatus('Klik tombol untuk menyalakan kamera', false);
+            const statusEl = document.getElementById('cameraGestureStatus');
+            if (statusEl) statusEl.textContent = 'Kamera belum aktif';
+        }
+
+        function toggleCamera() {
+            if (STATE.isCameraOn) {
+                stopCamera();
+            } else {
+                startCamera();
+            }
+        }
+
+        function startManualFrameLoop() {
+            const loop = async () => {
+                if (!STATE.isCameraOn) return;
+                try {
+                    const webcam = document.getElementById('webcam');
+                    if (STATE.hands && webcam && webcam.readyState === 4) {
+                        await STATE.hands.send({ image: webcam });
+                    }
+                } catch (e) {}
+                requestAnimationFrame(loop);
+            };
+            requestAnimationFrame(loop);
+        }
+
+        async function startFeedbackCamera() {
+            if (STATE.isFeedbackCameraOn) return;
+            await initFeedbackHands();
+            try {
+                STATE.feedbackMediaStream = await navigator.mediaDevices.getUserMedia({
+                    video: { width: { ideal: 480 }, height: { ideal: 360 } }
+                });
+                const feedbackWebcam = document.getElementById('feedbackWebcam');
+                if (feedbackWebcam) feedbackWebcam.srcObject = STATE.feedbackMediaStream;
+                const canvas = document.getElementById('feedbackHandsCanvas');
+                if (canvas) {
+                    canvas.width = 480;
+                    canvas.height = 360;
+                }
+                STATE.isFeedbackCameraOn = true;
+                startFeedbackFrameLoop();
+                const feedbackText = document.getElementById('feedbackText');
+                if (feedbackText) {
+                    feedbackText.textContent = STATE.selectedLessonItem ? `Coba tunjukkan isyarat untuk "${STATE.selectedLessonItem}"` : 'Pilih huruf terlebih dahulu';
+                }
+            } catch (e) {
+                console.error('Start feedback camera error:', e);
+                const feedbackText = document.getElementById('feedbackText');
+                if (feedbackText) feedbackText.textContent = `Kamera error: ${e.message}`;
+            }
+        }
+
+        function stopFeedbackCamera() {
+            if (!STATE.isFeedbackCameraOn) return;
+            if (STATE.feedbackMediaStream) {
+                STATE.feedbackMediaStream.getTracks().forEach(track => track.stop());
+                STATE.feedbackMediaStream = null;
+            }
+            const feedbackWebcam = document.getElementById('feedbackWebcam');
+            if (feedbackWebcam) feedbackWebcam.srcObject = null;
+            STATE.isFeedbackCameraOn = false;
+        }
+
+        function toggleFeedbackCamera() {
+            if (STATE.isFeedbackCameraOn) {
+                stopFeedbackCamera();
+            } else {
+                startFeedbackCamera();
+            }
+        }
+
+        function startFeedbackFrameLoop() {
+            const loop = async () => {
+                if (!STATE.isFeedbackCameraOn) return;
+                try {
+                    const feedbackWebcam = document.getElementById('feedbackWebcam');
+                    if (STATE.feedbackHands && feedbackWebcam && feedbackWebcam.readyState === 4) {
+                        await STATE.feedbackHands.send({ image: feedbackWebcam });
+                    }
+                } catch (e) {}
+                requestAnimationFrame(loop);
+            };
+            requestAnimationFrame(loop);
+        }
+
+        function updateCameraStatus(text, isActive) {
+            const cameraStatusText = document.getElementById('cameraStatusText');
+            const cameraStatusDot = document.getElementById('cameraStatusDot');
+            if (cameraStatusText) cameraStatusText.textContent = text;
+            if (cameraStatusDot) cameraStatusDot.classList.toggle('recording', isActive);
+        }
+
+        function toggleRecordingForCamera() {
+            if (STATE.isRecording) {
+                stopRecordingForCamera();
+            } else {
+                startRecordingForCamera();
+            }
+        }
+
+        function startRecordingForCamera() {
+            initSpeechRecognition();
+            if (!STATE.speechRecognition) return;
+            STATE.speechRecognition.lang = 'id-ID';
+            STATE.speechRecognition.onresult = (event) => {
+                let transcript = '';
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    transcript += event.results[i][0].transcript;
+                }
+                const textarea = document.getElementById('cameraTranscript');
+                if (textarea) textarea.value += transcript;
+            };
+            STATE.speechRecognition.start();
+            STATE.isRecording = true;
+            updateCameraStatus('Merekam suara (gestur: 🖐️ berhenti)', true);
+        }
+
+        function stopRecordingForCamera() {
+            if (!STATE.speechRecognition) return;
+            try { STATE.speechRecognition.stop(); } catch (e) {}
+            STATE.isRecording = false;
+            updateCameraStatus('Kamera aktif (gestur: 👍️ mulai)', true);
+        }
+
+        // Lessons
+        function renderLessons() {
+            Object.entries(LESSON_DATA).forEach(([type, items]) => {
+                const grid = document.getElementById(`${type}Grid`);
+                if (!grid) return;
+                grid.innerHTML = '';
+                items.forEach(item => {
+                    const div = document.createElement('div');
+                    div.className = 'lesson-item';
+                    div.innerHTML = `<span>${item}</span><small>${item}</small>`;
+                    div.addEventListener('click', () => selectLessonItem(type, item, div));
+                    grid.appendChild(div);
+                });
+            });
+        }
+
+        function selectLessonItem(type, item, element) {
+            document.querySelectorAll('.lesson-item').forEach(el => el.classList.remove('active'));
+            element.classList.add('active');
+            STATE.selectedLessonItem = item;
+            const feedbackText = document.getElementById('feedbackText');
+            if (feedbackText) feedbackText.textContent = `Coba tunjukkan isyarat untuk "${item}"`;
+        }
+
+        function switchLesson(lesson) {
+            STATE.currentLesson = lesson;
+            document.querySelectorAll('.lesson-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.lesson === lesson);
+            });
+            const alphabetGrid = document.getElementById('alphabetGrid');
+            const numbersGrid = document.getElementById('numbersGrid');
+            const greetingsGrid = document.getElementById('greetingsGrid');
+            if (alphabetGrid) alphabetGrid.classList.toggle('hidden', lesson !== 'alphabet');
+            if (numbersGrid) numbersGrid.classList.toggle('hidden', lesson !== 'numbers');
+            if (greetingsGrid) greetingsGrid.classList.toggle('hidden', lesson !== 'greetings');
+        }
+
+        function checkLessonFeedback(landmarks) {
+            if (!STATE.selectedLessonItem) return;
+            const gesture = detectGesture(landmarks);
+            const isCorrect = gesture !== null;
+            const feedbackText = document.getElementById('feedbackText');
+            if (feedbackText) {
+                feedbackText.classList.remove('correct', 'incorrect');
+                feedbackText.classList.add(isCorrect ? 'correct' : 'incorrect');
+                feedbackText.textContent = isCorrect ? `Bagus! Isyarat "${STATE.selectedLessonItem}" terdeteksi!` : `Coba lagi untuk "${STATE.selectedLessonItem}"`;
+            }
+        }
+    </script>
 </body>
 </html>
