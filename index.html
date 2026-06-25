@@ -959,9 +959,70 @@
             color: var(--accent-primary);
         }
 
+        /* Lesson Page - Side-by-Side Layout */
+        .lesson-section-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+        }
+
+        .lesson-left-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .lesson-right-panel {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .guidance-box {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .guidance-box h3 {
+            margin-bottom: 12px;
+            color: var(--accent-primary);
+        }
+
+        .guidance-image-container {
+            width: 100%;
+            min-height: 250px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            margin-bottom: 12px;
+        }
+
+        .guidance-image-container img {
+            max-width: 100%;
+            max-height: 250px;
+            object-fit: contain;
+        }
+
+        .guidance-placeholder {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
         /* Responsive Styles */
         @media (min-width: 1025px) {
             .camera-section-container {
+                flex-direction: row;
+            }
+            .lesson-section-container {
                 flex-direction: row;
             }
         }
@@ -1373,28 +1434,49 @@
                         <div class="lesson-selector">
                             <button class="lesson-btn active" data-lesson="alphabet">Alfabet A-Z</button>
                             <button class="lesson-btn" data-lesson="numbers">Angka 0-10</button>
-                            <button class="lesson-btn" data-lesson="greetings">Sapaan</button>
+                            <button class="lesson-btn" data-lesson="words">Kata Dasar</button>
                         </div>
-                        <div id="lessonContent" class="lesson-content">
-                            <div class="lesson-grid" id="alphabetGrid"></div>
-                            <div class="lesson-grid hidden" id="numbersGrid"></div>
-                            <div class="lesson-grid hidden" id="greetingsGrid"></div>
-                        </div>
-                        <div class="feedback-panel">
-                            <div class="feedback-header">
-                                <h3>Feedback Kamera</h3>
-                                <button id="toggleFeedbackCamBtn" class="toggle-camera-btn-small">
-                                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
-                                        <circle cx="12" cy="12" r="3"/>
-                                    </svg>
-                                </button>
+                        
+                        <div class="lesson-section-container">
+                            <!-- Left Panel: Lesson Grid -->
+                            <div class="lesson-left-panel">
+                                <div id="lessonContent" class="lesson-content">
+                                    <div class="lesson-grid" id="alphabetGrid"></div>
+                                    <div class="lesson-grid hidden" id="numbersGrid"></div>
+                                    <div class="lesson-grid hidden" id="wordsGrid"></div>
+                                </div>
                             </div>
-                            <div class="feedback-webcam-container" id="feedbackWebcamContainer">
-                                <video id="feedbackWebcam" class="webcam-video-small" autoplay playsinline muted></video>
-                                <canvas id="feedbackHandsCanvas" class="hands-canvas-small"></canvas>
+                            
+                            <!-- Right Panel: Guidance + Webcam -->
+                            <div class="lesson-right-panel">
+                                <!-- Guidance Box with Image -->
+                                <div class="guidance-box">
+                                    <h3>Panduan Isyarat</h3>
+                                    <div class="guidance-image-container" id="guidanceImageContainer">
+                                        <div class="guidance-placeholder" id="guidancePlaceholder">Pilih huruf atau kata untuk melihat panduan</div>
+                                        <img id="guidanceImage" style="display: none;" alt="Panduan isyarat" />
+                                    </div>
+                                    <p id="guidanceText" style="color: var(--text-secondary); font-size: 14px;">Pilih item di sebelah kiri untuk memulai</p>
+                                </div>
+                                
+                                <!-- Feedback Webcam Panel -->
+                                <div class="feedback-panel">
+                                    <div class="feedback-header">
+                                        <h3>Feedback Kamera</h3>
+                                        <button id="toggleFeedbackCamBtn" class="toggle-camera-btn-small">
+                                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                                <circle cx="12" cy="12" r="3"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div class="feedback-webcam-container" id="feedbackWebcamContainer">
+                                        <video id="feedbackWebcam" class="webcam-video-small" autoplay playsinline muted></video>
+                                        <canvas id="feedbackHandsCanvas" class="hands-canvas-small"></canvas>
+                                    </div>
+                                    <div class="feedback-text" id="feedbackText">Pilih huruf dan tunjukkan isyarat!</div>
+                                </div>
                             </div>
-                            <div class="feedback-text" id="feedbackText">Pilih huruf dan tunjukkan isyarat!</div>
                         </div>
                     </div>
                 </section>
@@ -1460,7 +1542,7 @@
         const LESSON_DATA = {
             alphabet: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'],
             numbers: ['0','1','2','3','4','5','6','7','8','9','10'],
-            greetings: ['Halo','Selamat','Tinggal','Terima','Kasih','Maaf','Silakan']
+            words: ['LIHAT','WAJAH','SEDIH','DIRI','SAJA','DUDUK','KURSI','RASA','SALAH','KATA','TAKUT','MAAF','BANGUN','MALAM','TIDUR','TARIK']
         };
 
         // Initialize
@@ -1493,7 +1575,13 @@
 
             // Voice Page
             const langSelect = document.getElementById('languageSelectVoice');
-            if (langSelect) langSelect.addEventListener('change', (e) => { STATE.currentLanguage = e.target.value; });
+            if (langSelect) langSelect.addEventListener('change', (e) => { 
+                STATE.currentLanguage = e.target.value;
+                // Update recognition language if it's already initialized
+                if (STATE.speechRecognition) {
+                    STATE.speechRecognition.lang = e.target.value;
+                }
+            });
 
             const voiceMicBtn = document.getElementById('voiceMicBtn');
             if (voiceMicBtn) voiceMicBtn.addEventListener('click', toggleRecording);
@@ -1616,13 +1704,33 @@
         }
 
         function cleanupCurrentPage() {
-            stopRecording();
+            // Stop voice recording
+            if (STATE.isRecording) {
+                stopRecording();
+            }
+            
+            // Stop camera
             stopCamera();
+            
+            // Stop feedback camera
             stopFeedbackCamera();
+            
+            // Reset feedback text
             const feedbackText = document.getElementById('feedbackText');
             if (feedbackText) {
                 feedbackText.classList.remove('correct', 'incorrect');
             }
+            
+            // Reset voice UI
+            const voiceStatusDot = document.getElementById('voiceStatusDot');
+            const voiceStatusText = document.getElementById('voiceStatusText');
+            if (voiceStatusDot) voiceStatusDot.classList.remove('recording');
+            if (voiceStatusText) voiceStatusText.textContent = 'Siap merekam';
+            
+            const voiceMicBtn = document.getElementById('voiceMicBtn');
+            const voiceMicStatus = document.getElementById('voiceMicStatus');
+            if (voiceMicBtn) voiceMicBtn.classList.remove('recording');
+            if (voiceMicStatus) voiceMicStatus.textContent = 'Klik untuk mulai merekam';
         }
 
         // Stats
@@ -1681,7 +1789,7 @@
             URL.revokeObjectURL(url);
         }
 
-        // Speech Recognition
+        // Speech Recognition - Fixed Implementation
         function initSpeechRecognition() {
             if (STATE.speechRecognition) return;
             const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
@@ -1693,7 +1801,11 @@
             STATE.speechRecognition.continuous = true;
             STATE.speechRecognition.interimResults = false;
             STATE.speechRecognition.maxAlternatives = 1;
-            STATE.speechRecognition.lang = STATE.currentLanguage;
+            
+            // Get language from selector safely
+            const langSelect = document.getElementById('languageSelectVoice');
+            STATE.speechRecognition.lang = langSelect?.value || 'id-ID';
+            
             STATE.speechRecognition.onresult = (event) => {
                 let transcript = '';
                 for (let i = event.resultIndex; i < event.results.length; i++) {
@@ -1703,9 +1815,11 @@
                 }
                 if (transcript) {
                     const textarea = document.getElementById('voiceTranscript');
-                    if (textarea) textarea.value += transcript;
+                    if (textarea) {
+                        textarea.value += transcript;
+                    }
                 }
-                updateVoiceStatus('Mendengarkan...', true);
+                updateVoiceStatus('Merekam suara...', true);
             };
             STATE.speechRecognition.onerror = (e) => {
                 if (e.error !== 'no-speech') {
@@ -1714,7 +1828,16 @@
             };
             STATE.speechRecognition.onend = () => {
                 if (STATE.isRecording) {
-                    try { STATE.speechRecognition.start(); } catch (e) {}
+                    // Restart recognition if it stops unexpectedly
+                    try {
+                        setTimeout(() => {
+                            if (STATE.isRecording && STATE.speechRecognition) {
+                                STATE.speechRecognition.start();
+                            }
+                        }, 100);
+                    } catch (e) {
+                        console.error('Restart recognition error:', e);
+                    }
                 }
             };
         }
@@ -1730,19 +1853,35 @@
         function startRecording() {
             initSpeechRecognition();
             if (!STATE.speechRecognition) return;
-            STATE.speechRecognition.lang = STATE.currentLanguage;
-            STATE.speechRecognition.start();
-            STATE.isRecording = true;
+            
+            // Set language before starting
+            const langSelect = document.getElementById('languageSelectVoice');
+            STATE.speechRecognition.lang = langSelect?.value || 'id-ID';
+            
+            try {
+                STATE.speechRecognition.start();
+                STATE.isRecording = true;
+            } catch (e) {
+                console.error('Start recognition error:', e);
+                updateVoiceStatus('Gagal memulai perekaman', false);
+                return;
+            }
+            
             const voiceMicBtn = document.getElementById('voiceMicBtn');
             if (voiceMicBtn) voiceMicBtn.classList.add('recording');
             const voiceMicStatus = document.getElementById('voiceMicStatus');
             if (voiceMicStatus) voiceMicStatus.textContent = 'Mendengarkan...';
-            updateVoiceStatus('Merekam suara', true);
+            updateVoiceStatus('Merekam suara...', true);
         }
 
         function stopRecording() {
             if (!STATE.speechRecognition) return;
-            try { STATE.speechRecognition.stop(); } catch (e) {}
+            try { 
+                STATE.speechRecognition.abort();
+                STATE.speechRecognition.stop(); 
+            } catch (e) {
+                console.error('Stop recognition error:', e);
+            }
             STATE.isRecording = false;
             const voiceMicBtn = document.getElementById('voiceMicBtn');
             if (voiceMicBtn) voiceMicBtn.classList.remove('recording');
@@ -2361,6 +2500,33 @@
             document.querySelectorAll('.lesson-item').forEach(el => el.classList.remove('active'));
             element.classList.add('active');
             STATE.selectedLessonItem = item;
+            
+            // Update guidance image and text
+            const guidanceImage = document.getElementById('guidanceImage');
+            const guidancePlaceholder = document.getElementById('guidancePlaceholder');
+            const guidanceText = document.getElementById('guidanceText');
+            
+            if (guidanceImage && guidancePlaceholder && guidanceText) {
+                // Try to load guidance image from assets folder
+                // Note: User needs to add actual images to assets/bisindo/ folder
+                const imagePath = `assets/bisindo/${item.toLowerCase()}.jpg`;
+                
+                guidanceImage.onerror = () => {
+                    guidanceImage.style.display = 'none';
+                    guidancePlaceholder.style.display = 'block';
+                    guidancePlaceholder.textContent = `Panduan untuk "${item}" akan ditampilkan di sini`;
+                };
+                
+                guidanceImage.onload = () => {
+                    guidancePlaceholder.style.display = 'none';
+                    guidanceImage.style.display = 'block';
+                };
+                
+                guidanceImage.src = imagePath;
+                guidanceText.textContent = `Panduan isyarat untuk: ${item}`;
+            }
+            
+            // Update feedback text
             const feedbackText = document.getElementById('feedbackText');
             if (feedbackText) feedbackText.textContent = `Coba tunjukkan isyarat untuk "${item}"`;
         }
@@ -2372,16 +2538,40 @@
             });
             const alphabetGrid = document.getElementById('alphabetGrid');
             const numbersGrid = document.getElementById('numbersGrid');
-            const greetingsGrid = document.getElementById('greetingsGrid');
+            const wordsGrid = document.getElementById('wordsGrid');
             if (alphabetGrid) alphabetGrid.classList.toggle('hidden', lesson !== 'alphabet');
             if (numbersGrid) numbersGrid.classList.toggle('hidden', lesson !== 'numbers');
-            if (greetingsGrid) greetingsGrid.classList.toggle('hidden', lesson !== 'greetings');
+            if (wordsGrid) wordsGrid.classList.toggle('hidden', lesson !== 'words');
+            
+            // Reset guidance when switching lesson
+            STATE.selectedLessonItem = null;
+            const guidanceImage = document.getElementById('guidanceImage');
+            const guidancePlaceholder = document.getElementById('guidancePlaceholder');
+            const guidanceText = document.getElementById('guidanceText');
+            if (guidanceImage) guidanceImage.style.display = 'none';
+            if (guidancePlaceholder) {
+                guidancePlaceholder.style.display = 'block';
+                guidancePlaceholder.textContent = 'Pilih huruf atau kata untuk melihat panduan';
+            }
+            if (guidanceText) guidanceText.textContent = 'Pilih item di sebelah kiri untuk memulai';
+            const feedbackText = document.getElementById('feedbackText');
+            if (feedbackText) feedbackText.textContent = 'Pilih huruf dan tunjukkan isyarat!';
         }
 
         function checkLessonFeedback(landmarks) {
             if (!STATE.selectedLessonItem) return;
             const gesture = detectGesture(landmarks);
-            const isCorrect = gesture !== null;
+            
+            let isCorrect = false;
+            if (gesture) {
+                // Check if the detected gesture matches the selected lesson item
+                if (gesture.type === 'letter' && gesture.value === STATE.selectedLessonItem) {
+                    isCorrect = true;
+                } else if (gesture.type === 'word' && gesture.value === STATE.selectedLessonItem) {
+                    isCorrect = true;
+                }
+            }
+            
             const feedbackText = document.getElementById('feedbackText');
             if (feedbackText) {
                 feedbackText.classList.remove('correct', 'incorrect');
