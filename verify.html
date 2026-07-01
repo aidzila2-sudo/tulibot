@@ -27,12 +27,12 @@
             
             <form id="verifyForm" class="login-form">
                 <div class="otp-container">
-                    <input type="text" maxlength="1" class="otp-input" data-index="0" pattern="[0-9]">
-                    <input type="text" maxlength="1" class="otp-input" data-index="1" pattern="[0-9]">
-                    <input type="text" maxlength="1" class="otp-input" data-index="2" pattern="[0-9]">
-                    <input type="text" maxlength="1" class="otp-input" data-index="3" pattern="[0-9]">
-                    <input type="text" maxlength="1" class="otp-input" data-index="4" pattern="[0-9]">
-                    <input type="text" maxlength="1" class="otp-input" data-index="5" pattern="[0-9]">
+                    <input type="text" maxlength="1" class="otp-input" data-index="0" pattern="[0-9]" placeholder="0">
+                    <input type="text" maxlength="1" class="otp-input" data-index="1" pattern="[0-9]" placeholder="0">
+                    <input type="text" maxlength="1" class="otp-input" data-index="2" pattern="[0-9]" placeholder="0">
+                    <input type="text" maxlength="1" class="otp-input" data-index="3" pattern="[0-9]" placeholder="0">
+                    <input type="text" maxlength="1" class="otp-input" data-index="4" pattern="[0-9]" placeholder="0">
+                    <input type="text" maxlength="1" class="otp-input" data-index="5" pattern="[0-9]" placeholder="0">
                 </div>
                 
                 <div id="verifyError" class="error-message" style="display: none;"></div>
@@ -50,15 +50,12 @@
     </div>
     
     <script>
-        // Get email from URL params
         function getUrlParam(param) {
             const urlParams = new URLSearchParams(window.location.search);
             return urlParams.get(param);
         }
         
         const email = getUrlParam('email');
-        
-        // OTP input handling
         const otpInputs = document.querySelectorAll('.otp-input');
         
         otpInputs.forEach((input, index) => {

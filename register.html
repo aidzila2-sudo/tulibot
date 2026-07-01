@@ -38,7 +38,7 @@
                 
                 <div class="form-group">
                     <label for="password">Password</label>
-                    <input type="password" id="password" name="password" required placeholder="Masukkan password">
+                    <input type="password" id="password" name="password" required placeholder="Masukkan password (min. 6 karakter)">
                 </div>
                 
                 <div class="form-group">
@@ -59,10 +59,10 @@
             <button class="google-btn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M12 22C17.523 22 22 17.523 22 12S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Z" stroke="#4285F4" stroke-width="1.5"/>
-                    <path d="M12 6.5c1.8 0 3.3.7 4.5 1.9L18 6c-1.7-1.5-3.9-2.4-6-2.4-3.6 0-6.6 2.2-7.7 5.2l2 1.4C6.9 8 9.2 6.5 12 6.5Z" fill="#EA4335"/>
+                    <path d="M12 6.5c1.8 0 3.3.7 4.5 1.9L18 6c-1.7-1.5-3.9-2.4-6-2.4C7.5 3.6 4.8 5.7 3.7 8.8l2 1.4C6.9 8 9.2 6.5 12 6.5Z" fill="#EA4335"/>
                     <path d="M21.3 12.2c0-.8-.1-1.5-.3-2.2H12v4.4h5.2c-.2 1.3-1 2.4-2.1 3.1l1.7 1.3c1.4-1.3 2.5-3.3 2.5-6.6Z" fill="#4285F4"/>
-                    <path d="M4.3 14.5c-.8-1.3-.8-3 0-4.3l-2-1.4C.6 10.5 0 11.2 0 12s.6 1.5 1.6 2.1l2-1.6Z" fill="#FBBC05"/>
-                    <path d="M12 19.5c2.8 0 5.2-.9 7-2.5l-1.7-1.3c-1.2.9-2.8 1.4-4.3 1.4-2.8 0-5.1-1.5-6.1-3.8l-2 1.4C6.3 17.3 8.9 19.5 12 19.5Z" fill="#34A853"/>
+                    <path d="M4.3 14.5c-.8-1.3-.8-2.7 0-4L2.3 9C.6 12 .6 15 2.3 17.5l2-1.4C4.4 15.5 4.3 15 4.3 14.5Z" fill="#FBBC05"/>
+                    <path d="M12 19.5c-2.8 0-5.2-1.4-7-3.8l-2 1.4C4.7 19.5 8 21 12 21c3.1 0 5.9-1.2 8-3.3l-1.7-1.3C16.3 17.7 14.2 19.5 12 19.5Z" fill="#34A853"/>
                 </svg>
                 Daftar dengan Google
             </button>
@@ -113,7 +113,6 @@
                 if (data.success) {
                     successEl.textContent = data.message;
                     successEl.style.display = 'block';
-                    // Redirect to verify page after a delay
                     setTimeout(() => {
                         window.location.href = 'verify.html?email=' + encodeURIComponent(email);
                     }, 2000);
