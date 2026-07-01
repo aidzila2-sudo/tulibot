@@ -11,7 +11,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 $data = json_decode(file_get_contents('php://input'), true);
 
 if (!isset($data['email']) || !isset($data['password'])) {
-    echo json_encode(['success' => false, 'message' => 'Email and password are required']);
+    echo json_encode(['success' => false, 'message' => 'Email/Username and password are required']);
     exit;
 }
 
@@ -24,6 +24,12 @@ try {
     $user = $stmt->fetch();
 
     if ($user && password_verify($password, $user['password'])) {
+        // Check if user is verified
+        if (!$user['is_verified']) {
+            echo json_encode(['success' => false, 'message' => 'Email Anda belum terverifikasi! Silakan verifikasi terlebih dahulu', 'needsVerification' => true, 'email' => $user['email']]);
+            exit;
+        }
+        
         $_SESSION['user_id'] = $user['id'];
         $_SESSION['username'] = $user['username'];
         $_SESSION['role'] = $user['role'];
@@ -38,7 +44,7 @@ try {
             ]
         ]);
     } else {
-        echo json_encode(['success' => false, 'message' => 'Invalid credentials']);
+        echo json_encode(['success' => false, 'message' => 'Email/Username atau password salah']);
     }
 } catch (PDOException $e) {
     echo json_encode(['success' => false, 'message' => 'Database error']);

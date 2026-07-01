@@ -48,8 +48,18 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Redirect ke halaman utama dengan replace()
                 window.location.replace('index.html');
             } else {
-                loginError.textContent = data.message || 'Login gagal';
-                loginError.style.display = 'block';
+                // Jika user butuh verifikasi email
+                if (data.needsVerification && data.email) {
+                    loginError.textContent = data.message;
+                    loginError.style.display = 'block';
+                    // Tambahkan link ke halaman verifikasi
+                    setTimeout(() => {
+                        window.location.href = 'verify.html?email=' + encodeURIComponent(data.email);
+                    }, 2000);
+                } else {
+                    loginError.textContent = data.message || 'Login gagal';
+                    loginError.style.display = 'block';
+                }
             }
         } catch (error) {
             loginError.textContent = 'Terjadi kesalahan. Silakan coba lagi.';

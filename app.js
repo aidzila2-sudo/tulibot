@@ -1,17 +1,7 @@
-// VoiceScript Ultimate - SPA & Modular (FIXED)
 
-const CONFIG = {
-    MAX_FPS: 5,
-    MIN_FRAME_DELAY: 200,
-    SHAKE_THRESHOLD: 20,
-    GESTURE_COOLDOWN: 1500,
-    API_BASE: '../backend/api'
-};
-
+// VoiceScript Ultimate - Fixed Backend-Less Version
 const STATE = {
     currentPage: 'home',
-    isCheckingAuth: false,
-    user: null,
     isRecording: false,
     isCameraOn: false,
     isFeedbackCameraOn: false,
@@ -30,606 +20,304 @@ const STATE = {
     selectedLessonItem: null
 };
 
-const DOM = {
-    // User
-    sidebarUserName: document.getElementById('sidebarUserName'),
-    sidebarUserRole: document.getElementById('sidebarUserRole'),
-    mobileUserName: document.getElementById('mobileUserName'),
-    welcomeUser: document.getElementById('welcomeUser'),
-    
-    // Stats
-    totalChars: document.getElementById('totalChars'),
-    totalWords: document.getElementById('totalWords'),
-    totalTranscripts: document.getElementById('totalTranscripts'),
-    streakDays: document.getElementById('streakDays'),
-    
-    // Navigation
-    sidebarLinks: document.querySelectorAll('.sidebar-link'),
-    bottomLinks: document.querySelectorAll('.bottom-link'),
-    shortcutCards: document.querySelectorAll('.shortcut-card'),
-    sidebarLogoutBtn: document.getElementById('sidebarLogoutBtn'),
-    
-    // Voice to Text
-    languageSelectVoice: document.getElementById('languageSelectVoice'),
-    voiceStatusDot: document.getElementById('voiceStatusDot'),
-    voiceStatusText: document.getElementById('voiceStatusText'),
-    voiceTranscript: document.getElementById('voiceTranscript'),
-    copyVoiceBtn: document.getElementById('copyVoiceBtn'),
-    clearVoiceBtn: document.getElementById('clearVoiceBtn'),
-    downloadVoiceBtn: document.getElementById('downloadVoiceBtn'),
-    saveVoiceBtn: document.getElementById('saveVoiceBtn'),
-    voiceMicBtn: document.getElementById('voiceMicBtn'),
-    voiceMicStatus: document.getElementById('voiceMicStatus'),
-    
-    // Kamera Kontrol
-    cameraStatusDot: document.getElementById('cameraStatusDot'),
-    cameraStatusText: document.getElementById('cameraStatusText'),
-    cameraTranscript: document.getElementById('cameraTranscript'),
-    webcam: document.getElementById('webcam'),
-    handsCanvas: document.getElementById('handsCanvas'),
-    cameraGestureStatus: document.getElementById('cameraGestureStatus'),
-    toggleCameraBtn: document.getElementById('toggleCameraBtn'),
-    copyCameraBtn: document.getElementById('copyCameraBtn'),
-    clearCameraBtn: document.getElementById('clearCameraBtn'),
-    downloadCameraBtn: document.getElementById('downloadCameraBtn'),
-    saveCameraBtn: document.getElementById('saveCameraBtn'),
-    
-    // Belajar Isyarat
-    lessonBtns: document.querySelectorAll('.lesson-btn'),
-    alphabetGrid: document.getElementById('alphabetGrid'),
-    numbersGrid: document.getElementById('numbersGrid'),
-    greetingsGrid: document.getElementById('greetingsGrid'),
-    feedbackWebcam: document.getElementById('feedbackWebcam'),
-    feedbackHandsCanvas: document.getElementById('feedbackHandsCanvas'),
-    toggleFeedbackCamBtn: document.getElementById('toggleFeedbackCamBtn'),
-    feedbackText: document.getElementById('feedbackText')
-};
-
 const LESSON_DATA = {
-    alphabet: ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z'],
-    numbers: ['0','1','2','3','4','5','6','7','8','9','10'],
-    greetings: ['Halo','Selamat','Tinggal','Terima','Kasih','Maaf','Silakan']
+    alphabet: ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z'],
+    numbers: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'],
+    greetings: ['Halo', 'Selamat', 'Tinggal', 'Terima', 'Kasih', 'Maaf', 'Silakan']
 };
 
-// ==================== UTILITY ====================
-
-function safeGetStoredAuth() {
-    try {
-        const data = localStorage.getItem('voicescript_auth');
-        return data ? JSON.parse(data) : null;
-    } catch (e) {
-        console.warn('Auth read error:', e);
-        return null;
-    }
-}
-
-function safeSetStoredAuth(data) {
-    try {
-        localStorage.setItem('voicescript_auth', JSON.stringify(data));
-    } catch (e) {
-        console.warn('Auth write error:', e);
-    }
-}
-
-function safeRemoveStoredAuth() {
-    try {
-        localStorage.removeItem('voicescript_auth');
-    } catch (e) {
-        console.warn('Auth remove error:', e);
-    }
-}
-
-// ==================== AUTH ====================
-
-async function safeCheckAuth() {
-    if (STATE.isCheckingAuth) return;
-    STATE.isCheckingAuth = true;
-    let storedAuth = safeGetStoredAuth();
+// ================================================
+// INITIALIZATION - START
+// ================================================
+document.addEventListener('DOMContentLoaded', function() {
+    // 1. ATTACH ALL EVENT LISTENERS FIRST (ANTI-BLOCKING)
+    attachEventListeners();
     
-    try {
-        const response = await fetch(`${CONFIG.API_BASE}/check_session.php`, {
-            method: 'GET',
-            credentials: 'include',
-            headers: { 'Accept': 'application/json' }
+    // 2. CHECK AUTH STATUS
+    checkAuthAndShowPage();
+});
+
+function attachEventListeners() {
+    // LOGIN FORM
+    const loginForm = document.getElementById('loginForm');
+    if (loginForm) {
+        loginForm.addEventListener('submit', handleLogin);
+    }
+    
+    // LOGOUT BUTTON
+    const logoutBtn = document.getElementById('sidebarLogoutBtn');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', logout);
+    }
+    
+    // NAVIGATION LINKS
+    attachNavigationEventListeners();
+    
+    // VOICE TO TEXT CONTROLS
+    attachVoiceToTextEventListeners();
+    
+    // CAMERA CONTROLS
+    attachCameraEventListeners();
+    
+    // BELAJAR ISYARAT CONTROLS
+    attachLessonEventListeners();
+}
+
+function attachNavigationEventListeners() {
+    // Sidebar links
+    document.querySelectorAll('.sidebar-link').forEach(link => {
+        link.addEventListener('click', function() {
+            const page = this.dataset.page;
+            if (page) switchPage(page);
         });
-        const result = await response.json();
-        
-        if (result.authenticated) {
-            storedAuth = result.user;
-            safeSetStoredAuth(storedAuth);
-        }
-    } catch (e) {
-        console.warn('Session check failed, using local:', e);
+    });
+    
+    // Bottom nav links
+    document.querySelectorAll('.bottom-link').forEach(link => {
+        link.addEventListener('click', function() {
+            const page = this.dataset.page;
+            if (page) switchPage(page);
+        });
+    });
+    
+    // Shortcut cards
+    document.querySelectorAll('.shortcut-card').forEach(card => {
+        card.addEventListener('click', function() {
+            const page = this.dataset.page;
+            if (page) switchPage(page);
+        });
+    });
+}
+
+function attachVoiceToTextEventListeners() {
+    const langSelect = document.getElementById('languageSelectVoice');
+    if (langSelect) {
+        langSelect.addEventListener('change', function() {
+            STATE.currentLanguage = this.value;
+        });
     }
     
-    if (storedAuth) {
-        STATE.user = storedAuth;
-        updateUserUI();
-        loadStats();
+    const micBtn = document.getElementById('voiceMicBtn');
+    if (micBtn) {
+        micBtn.addEventListener('click', toggleRecording);
+    }
+    
+    const copyBtn = document.getElementById('copyVoiceBtn');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', () => copyText('voiceTranscript'));
+    }
+    
+    const clearBtn = document.getElementById('clearVoiceBtn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => clearText('voiceTranscript'));
+    }
+    
+    const downloadBtn = document.getElementById('downloadVoiceBtn');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', () => downloadText('voiceTranscript', `voicescript-${Date.now()}.txt`));
+    }
+    
+    const saveBtn = document.getElementById('saveVoiceBtn');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', () => saveTranscript('voiceTranscript', 'voice'));
+    }
+}
+
+function attachCameraEventListeners() {
+    const toggleBtn = document.getElementById('toggleCameraBtn');
+    if (toggleBtn) {
+        toggleBtn.addEventListener('click', toggleCamera);
+    }
+    
+    const copyBtn = document.getElementById('copyCameraBtn');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', () => copyText('cameraTranscript'));
+    }
+    
+    const clearBtn = document.getElementById('clearCameraBtn');
+    if (clearBtn) {
+        clearBtn.addEventListener('click', () => clearText('cameraTranscript'));
+    }
+    
+    const downloadBtn = document.getElementById('downloadCameraBtn');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', () => downloadText('cameraTranscript', `voicescript-gesture-${Date.now()}.txt`));
+    }
+    
+    const saveBtn = document.getElementById('saveCameraBtn');
+    if (saveBtn) {
+        saveBtn.addEventListener('click', () => saveTranscript('cameraTranscript', 'gesture'));
+    }
+}
+
+function attachLessonEventListeners() {
+    document.querySelectorAll('.lesson-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+            switchLesson(this.dataset.lesson);
+        });
+    });
+    
+    const toggleFeedbackBtn = document.getElementById('toggleFeedbackCamBtn');
+    if (toggleFeedbackBtn) {
+        toggleFeedbackBtn.addEventListener('click', toggleFeedbackCamera);
+    }
+}
+
+// ================================================
+// AUTH & LOGIN - START
+// ================================================
+function checkAuthAndShowPage() {
+    const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+    if (isLoggedIn) {
+        showApp();
     } else {
-        window.location.replace('login.html');
+        showLogin();
     }
+}
+
+function showLogin() {
+    const loginSection = document.getElementById('loginSection');
+    const appSection = document.getElementById('appSection');
+    if (loginSection) loginSection.style.display = 'flex';
+    if (appSection) appSection.style.display = 'none';
+}
+
+function showApp() {
+    const loginSection = document.getElementById('loginSection');
+    const appSection = document.getElementById('appSection');
+    if (loginSection) loginSection.style.display = 'none';
+    if (appSection) appSection.style.display = 'block';
     
-    STATE.isCheckingAuth = false;
+    updateUserUI();
+    loadStats();
+    renderLessons();
+}
+
+function handleLogin(e) {
+    e.preventDefault();
+    const email = document.getElementById('email').value.trim();
+    const password = document.getElementById('password').value;
+    const errorEl = document.getElementById('loginError');
+    
+    if ((email === 'admin@voicescript.com' || email === 'admin') && password === 'password') {
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('username', 'Admin');
+        showApp();
+    } else {
+        if (errorEl) {
+            errorEl.textContent = 'Email atau password salah!';
+            errorEl.style.display = 'block';
+        }
+    }
+}
+
+function logout() {
+    localStorage.removeItem('isLoggedIn');
+    localStorage.removeItem('username');
+    cleanupCurrentPage();
+    showLogin();
 }
 
 function updateUserUI() {
-    if (DOM.sidebarUserName && STATE.user) DOM.sidebarUserName.textContent = STATE.user.username;
-    if (DOM.sidebarUserRole && STATE.user) DOM.sidebarUserRole.textContent = STATE.user.role;
-    if (DOM.mobileUserName && STATE.user) DOM.mobileUserName.textContent = STATE.user.username;
-    if (DOM.welcomeUser && STATE.user) DOM.welcomeUser.textContent = `Selamat datang kembali, ${STATE.user.username}!`;
-}
-
-async function logout() {
-    try {
-        await fetch(`${CONFIG.API_BASE}/logout.php`, {
-            method: 'POST',
-            credentials: 'include'
-        });
-    } catch (e) {}
-    safeRemoveStoredAuth();
-    window.location.replace('login.html');
-}
-
-function loadStats() {
-    try {
-        const transcripts = JSON.parse(localStorage.getItem('voicescript_transcripts') || '[]');
-        const totalChars = transcripts.reduce((sum, t) => sum + (t.text?.length || 0), 0);
-        const totalWords = transcripts.reduce((sum, t) => sum + (t.text?.split(/\s+/).length || 0), 0);
-        
-        if (DOM.totalChars) DOM.totalChars.textContent = totalChars.toLocaleString();
-        if (DOM.totalWords) DOM.totalWords.textContent = totalWords.toLocaleString();
-        if (DOM.totalTranscripts) DOM.totalTranscripts.textContent = transcripts.length;
-        if (DOM.streakDays) DOM.streakDays.textContent = 1;
-    } catch (e) {}
-}
-
-// ==================== PAGE NAVIGATION ====================
-
-function switchPage(pageId) {
-    // 1. First clean up current resources (anti-crash!)
-    cleanupCurrentPage();
+    const username = localStorage.getItem('username') || 'User';
+    const sidebarName = document.getElementById('sidebarUserName');
+    const mobileName = document.getElementById('mobileUserName');
+    const welcomeUser = document.getElementById('welcomeUser');
     
-    // 2. Update state
+    if (sidebarName) sidebarName.textContent = username;
+    if (mobileName) mobileName.textContent = username;
+    if (welcomeUser) welcomeUser.textContent = `Selamat datang kembali, ${username}!`;
+}
+
+// ================================================
+// PAGE NAVIGATION - START
+// ================================================
+function switchPage(pageId) {
+    cleanupCurrentPage();
     STATE.currentPage = pageId;
     
-    // 3. Toggle page visibility
-    const pages = document.querySelectorAll('.page');
-    pages.forEach(page => {
-        page.classList.remove('active');
-    });
+    // Update active page
+    document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
     const targetPage = document.getElementById(`page-${pageId}`);
     if (targetPage) {
         targetPage.classList.add('active');
     }
     
-    // 4. Update navigation active states
-    DOM.sidebarLinks.forEach(link => {
-        link.classList.toggle('active', link.dataset.page === pageId);
-    });
-    DOM.bottomLinks.forEach(link => {
+    // Update sidebar links
+    document.querySelectorAll('.sidebar-link').forEach(link => {
         link.classList.toggle('active', link.dataset.page === pageId);
     });
     
-    // 5. Initialize features for new page
-    initializePageFeatures(pageId);
+    // Update bottom nav
+    document.querySelectorAll('.bottom-link').forEach(link => {
+        link.classList.toggle('active', link.dataset.page === pageId);
+    });
     
-    console.log(`Switched to page: ${pageId}`); // Debug log
-}
-
-function cleanupCurrentPage() {
-    stopRecording();
-    stopCamera();
-    stopFeedbackCamera();
-    DOM.feedbackText?.classList.remove('correct', 'incorrect');
-}
-
-function initializePageFeatures(pageId) {
+    // Initialize page-specific features
     if (pageId === 'belajarisyarat') {
         renderLessons();
     }
 }
 
-// ==================== LESSONS ====================
-
-function renderLessons() {
-    Object.entries(LESSON_DATA).forEach(([type, items]) => {
-        const grid = DOM[`${type}Grid`];
-        if (!grid) return;
-        grid.innerHTML = '';
-        items.forEach(item => {
-            const div = document.createElement('div');
-            div.className = 'lesson-item';
-            div.innerHTML = `<span>${item}</span><small>${item}</small>`;
-            div.addEventListener('click', () => selectLessonItem(type, item, div));
-            grid.appendChild(div);
-        });
-    });
-}
-
-function selectLessonItem(type, item, element) {
-    document.querySelectorAll('.lesson-item').forEach(el => el.classList.remove('active'));
-    element.classList.add('active');
-    STATE.selectedLessonItem = item;
-    DOM.feedbackText.textContent = `Coba tunjukkan isyarat untuk "${item}"`;
-}
-
-function switchLesson(lesson) {
-    STATE.currentLesson = lesson;
-    DOM.lessonBtns.forEach(btn => btn.classList.toggle('active', btn.dataset.lesson === lesson));
-    DOM.alphabetGrid?.classList.toggle('hidden', lesson !== 'alphabet');
-    DOM.numbersGrid?.classList.toggle('hidden', lesson !== 'numbers');
-    DOM.greetingsGrid?.classList.toggle('hidden', lesson !== 'greetings');
-}
-
-// ==================== SPEECH RECOGNITION ====================
-
-function initSpeechRecognition() {
-    if (STATE.speechRecognition) return;
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    if (!SpeechRecognition) {
-        updateVoiceStatus('Browser tidak mendukung Speech Recognition', false);
-        return;
-    }
-    STATE.speechRecognition = new SpeechRecognition();
-    STATE.speechRecognition.continuous = true;
-    STATE.speechRecognition.interimResults = true;
-    
-    STATE.speechRecognition.onresult = (event) => {
-        let transcript = '';
-        for (let i = event.resultIndex; i < event.results.length; i++) {
-            transcript += event.results[i][0].transcript;
-        }
-        if (DOM.voiceTranscript) DOM.voiceTranscript.value += transcript;
-        updateVoiceStatus('Mendengarkan...', true);
-    };
-    
-    STATE.speechRecognition.onerror = (e) => {
-        if (e.error === 'no-speech') return;
-        updateVoiceStatus(`Error: ${e.error}`, false);
-    };
-    
-    STATE.speechRecognition.onend = () => {
-        if (STATE.isRecording) {
-            try { STATE.speechRecognition.start(); } catch (e) {}
-        }
-    };
-}
-
-function toggleRecording() {
-    initSpeechRecognition();
-    if (STATE.isRecording) {
+function cleanupCurrentPage() {
+    try {
         stopRecording();
-    } else {
-        startRecording();
-    }
-}
-
-function startRecording() {
-    if (!STATE.speechRecognition) return;
-    try {
-        STATE.speechRecognition.lang = STATE.currentLanguage;
-        STATE.speechRecognition.start();
-        STATE.isRecording = true;
-        DOM.voiceMicBtn?.classList.add('recording');
-        DOM.voiceMicStatus.textContent = 'Mendengarkan...';
-        updateVoiceStatus('Merekam suara', true);
-    } catch (e) {
-        console.warn('Start recording error:', e);
-    }
-}
-
-function stopRecording() {
-    if (!STATE.speechRecognition) return;
-    try { STATE.speechRecognition.stop(); } catch (e) {}
-    STATE.isRecording = false;
-    DOM.voiceMicBtn?.classList.remove('recording');
-    DOM.voiceMicStatus.textContent = 'Klik untuk mulai merekam';
-    updateVoiceStatus('Siap merekam', false);
-}
-
-function updateVoiceStatus(text, isActive) {
-    if (DOM.voiceStatusText) DOM.voiceStatusText.textContent = text;
-    if (DOM.voiceStatusDot) {
-        DOM.voiceStatusDot.classList.toggle('recording', isActive);
-    }
-}
-
-// ==================== MEDIAPIPE & CAMERA ====================
-
-async function initHands() {
-    if (STATE.hands) return;
-    try {
-        const hands = new Hands({
-            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
-        });
-        hands.setOptions({
-            maxNumHands: 1,
-            modelComplexity: 0,
-            minDetectionConfidence: 0.7,
-            minTrackingConfidence: 0.5
-        });
-        hands.onResults(onHandsResults);
-        STATE.hands = hands;
-    } catch (e) {
-        console.warn('MediaPipe init error:', e);
-    }
-}
-
-async function initFeedbackHands() {
-    if (STATE.feedbackHands) return;
-    try {
-        const hands = new Hands({
-            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
-        });
-        hands.setOptions({
-            maxNumHands: 1,
-            modelComplexity: 0,
-            minDetectionConfidence: 0.7,
-            minTrackingConfidence: 0.5
-        });
-        hands.onResults(onFeedbackHandsResults);
-        STATE.feedbackHands = hands;
-    } catch (e) {
-        console.warn('MediaPipe feedback init error:', e);
-    }
-}
-
-function onHandsResults(results) {
-    const canvas = DOM.handsCanvas;
-    if (!canvas) return;
-    const canvasCtx = canvas.getContext('2d');
-    canvasCtx.save();
-    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    if (results.multiHandLandmarks) {
-        for (const landmarks of results.multiHandLandmarks) {
-            drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: '#7c6dfa', lineWidth: 2 });
-            drawLandmarks(canvasCtx, landmarks, { color: '#ffffff', lineWidth: 1, radius: 3 });
-            const gesture = detectGesture(landmarks);
-            if (gesture) handleGesture(gesture);
-        }
-    }
-    canvasCtx.restore();
-}
-
-function onFeedbackHandsResults(results) {
-    const canvas = DOM.feedbackHandsCanvas;
-    if (!canvas) return;
-    const canvasCtx = canvas.getContext('2d');
-    canvasCtx.save();
-    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
-    
-    if (results.multiHandLandmarks) {
-        for (const landmarks of results.multiHandLandmarks) {
-            drawConnectors(canvasCtx, landmarks, HAND_CONNECTIONS, { color: '#7c6dfa', lineWidth: 2 });
-            drawLandmarks(canvasCtx, landmarks, { color: '#ffffff', lineWidth: 1, radius: 3 });
-            checkLessonFeedback(landmarks);
-        }
-    }
-    canvasCtx.restore();
-}
-
-function detectGesture(landmarks) {
-    const thumbTip = landmarks[4];
-    const indexTip = landmarks[8];
-    const middleTip = landmarks[12];
-    const ringTip = landmarks[16];
-    const pinkyTip = landmarks[20];
-    const wrist = landmarks[0];
-    
-    const thumbUp = thumbTip.y < indexTip.y && thumbTip.y < middleTip.y;
-    const indexUp = indexTip.y < landmarks[6].y;
-    const middleUp = middleTip.y < landmarks[10].y;
-    const ringUp = ringTip.y < landmarks[14].y;
-    const pinkyUp = pinkyTip.y < landmarks[18].y;
-    
-    if (thumbUp && !indexUp && !middleUp && !ringUp && !pinkyUp) return 'thumbsup';
-    if (indexUp && middleUp && ringUp && pinkyUp) return 'open';
-    if (!indexUp && !middleUp && !ringUp && !pinkyUp) return 'fist';
-    
-    return null;
-}
-
-function handleGesture(gesture) {
-    const now = Date.now();
-    if (now - STATE.lastGestureTime < CONFIG.GESTURE_COOLDOWN) return;
-    STATE.lastGestureTime = now;
-    
-    DOM.cameraGestureStatus.textContent = `Terdeteksi: ${gesture === 'thumbsup' ? '👍 Mulai Merekam' : gesture === 'open' ? '🖐️ Berhenti' : '✊ Hapus'}`;
-    DOM.cameraGestureStatus.classList.add('detected');
-    setTimeout(() => DOM.cameraGestureStatus.classList.remove('detected'), 500);
-    
-    if (gesture === 'thumbsup') {
-        if (!STATE.isRecording) toggleRecordingForCamera();
-    } else if (gesture === 'open') {
-        if (STATE.isRecording) toggleRecordingForCamera();
-    } else if (gesture === 'fist') {
-        if (DOM.cameraTranscript) DOM.cameraTranscript.value = '';
-    }
-}
-
-function checkLessonFeedback(landmarks) {
-    if (!STATE.selectedLessonItem) return;
-    const gesture = detectGesture(landmarks);
-    const isCorrect = gesture !== null;
-    
-    DOM.feedbackText.classList.remove('correct', 'incorrect');
-    DOM.feedbackText.classList.add(isCorrect ? 'correct' : 'incorrect');
-    DOM.feedbackText.textContent = isCorrect ? `Bagus! Isyarat "${STATE.selectedLessonItem}" terdeteksi!` : `Coba lagi untuk "${STATE.selectedLessonItem}"`;
-}
-
-async function startCamera() {
-    if (STATE.isCameraOn) return;
-    try {
-        await initHands();
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: { width: { ideal: 640 }, height: { ideal: 480 } }
-        });
-        STATE.mediaStream = stream;
-        if (DOM.webcam) DOM.webcam.srcObject = stream;
-        
-        const canvas = DOM.handsCanvas;
-        if (canvas) {
-            canvas.width = 640;
-            canvas.height = 480;
-        }
-        
-        STATE.isCameraOn = true;
-        startManualFrameLoop();
-        updateCameraStatus('Kamera aktif', true);
-        DOM.cameraGestureStatus.textContent = 'Kamera aktif, tunjukkan gestur';
-    } catch (e) {
-        updateCameraStatus(`Kamera error: ${e.message}`, false);
-    }
-}
-
-function stopCamera() {
-    if (!STATE.isCameraOn) return;
-    if (STATE.mediaStream) {
-        STATE.mediaStream.getTracks().forEach(track => track.stop());
-        STATE.mediaStream = null;
-    }
-    if (STATE.animationFrameId) {
-        cancelAnimationFrame(STATE.animationFrameId);
-        STATE.animationFrameId = null;
-    }
-    if (DOM.webcam) DOM.webcam.srcObject = null;
-    STATE.isCameraOn = false;
-    updateCameraStatus('Klik tombol untuk menyalakan kamera', false);
-    DOM.cameraGestureStatus.textContent = 'Kamera belum aktif';
-}
-
-function toggleCamera() {
-    if (STATE.isCameraOn) {
         stopCamera();
-    } else {
-        startCamera();
-    }
-}
-
-function startManualFrameLoop() {
-    const loop = async () => {
-        if (!STATE.isCameraOn) return;
-        const now = Date.now();
-        if (now - STATE.lastFrameTime >= CONFIG.MIN_FRAME_DELAY) {
-            try {
-                if (STATE.hands && DOM.webcam && DOM.webcam.readyState === 4) {
-                    await STATE.hands.send({ image: DOM.webcam });
-                }
-            } catch (e) {}
-            STATE.lastFrameTime = now;
-        }
-        STATE.animationFrameId = requestAnimationFrame(loop);
-    };
-    requestAnimationFrame(loop);
-}
-
-async function startFeedbackCamera() {
-    if (STATE.isFeedbackCameraOn) return;
-    try {
-        await initFeedbackHands();
-        const stream = await navigator.mediaDevices.getUserMedia({
-            video: { width: { ideal: 480 }, height: { ideal: 360 } }
-        });
-        STATE.feedbackMediaStream = stream;
-        if (DOM.feedbackWebcam) DOM.feedbackWebcam.srcObject = stream;
-        
-        const canvas = DOM.feedbackHandsCanvas;
-        if (canvas) {
-            canvas.width = 480;
-            canvas.height = 360;
-        }
-        
-        STATE.isFeedbackCameraOn = true;
-        startFeedbackFrameLoop();
-        DOM.feedbackText.textContent = STATE.selectedLessonItem ? `Coba tunjukkan isyarat untuk "${STATE.selectedLessonItem}"` : 'Pilih huruf terlebih dahulu';
-    } catch (e) {
-        DOM.feedbackText.textContent = `Kamera error: ${e.message}`;
-    }
-}
-
-function stopFeedbackCamera() {
-    if (!STATE.isFeedbackCameraOn) return;
-    if (STATE.feedbackMediaStream) {
-        STATE.feedbackMediaStream.getTracks().forEach(track => track.stop());
-        STATE.feedbackMediaStream = null;
-    }
-    if (STATE.feedbackAnimationFrameId) {
-        cancelAnimationFrame(STATE.feedbackAnimationFrameId);
-        STATE.feedbackAnimationFrameId = null;
-    }
-    if (DOM.feedbackWebcam) DOM.feedbackWebcam.srcObject = null;
-    STATE.isFeedbackCameraOn = false;
-}
-
-function toggleFeedbackCamera() {
-    if (STATE.isFeedbackCameraOn) {
         stopFeedbackCamera();
-    } else {
-        startFeedbackCamera();
-    }
-}
-
-function startFeedbackFrameLoop() {
-    const loop = async () => {
-        if (!STATE.isFeedbackCameraOn) return;
-        const now = Date.now();
-        if (now - STATE.lastFeedbackFrameTime >= CONFIG.MIN_FRAME_DELAY) {
-            try {
-                if (STATE.feedbackHands && DOM.feedbackWebcam && DOM.feedbackWebcam.readyState === 4) {
-                    await STATE.feedbackHands.send({ image: DOM.feedbackWebcam });
-                }
-            } catch (e) {}
-            STATE.lastFeedbackFrameTime = now;
+        const feedbackText = document.getElementById('feedbackText');
+        if (feedbackText) {
+            feedbackText.classList.remove('correct', 'incorrect');
         }
-        STATE.feedbackAnimationFrameId = requestAnimationFrame(loop);
-    };
-    requestAnimationFrame(loop);
-}
-
-function updateCameraStatus(text, isActive) {
-    if (DOM.cameraStatusText) DOM.cameraStatusText.textContent = text;
-    if (DOM.cameraStatusDot) {
-        DOM.cameraStatusDot.classList.toggle('recording', isActive);
+    } catch (e) {
+        console.error('Cleanup error:', e);
     }
 }
 
-function toggleRecordingForCamera() {
-    initSpeechRecognition();
-    if (STATE.isRecording) {
-        stopRecordingForCamera();
-    } else {
-        startRecordingForCamera();
-    }
-}
-
-function startRecordingForCamera() {
-    if (!STATE.speechRecognition) return;
+// ================================================
+// STATS & TRANSCRIPTS - START
+// ================================================
+function loadStats() {
     try {
-        STATE.speechRecognition.lang = 'id-ID';
-        STATE.speechRecognition.onresult = (event) => {
-            let transcript = '';
-            for (let i = event.resultIndex; i < event.results.length; i++) {
-                transcript += event.results[i][0].transcript;
-            }
-            if (DOM.cameraTranscript) DOM.cameraTranscript.value += transcript;
-        };
-        STATE.speechRecognition.start();
-        STATE.isRecording = true;
-        updateCameraStatus('Merekam suara (gestur: 🖐️ berhenti)', true);
-    } catch (e) {}
+        const transcripts = JSON.parse(localStorage.getItem('voicescript_data') || '[]');
+        const totalChars = transcripts.reduce((sum, t) => sum + (t.text?.length || 0), 0);
+        const totalWords = transcripts.reduce((sum, t) => sum + (t.text?.split(/\s+/).filter(word => word.length > 0).length || 0), 0);
+        
+        const totalCharsEl = document.getElementById('totalChars');
+        const totalWordsEl = document.getElementById('totalWords');
+        const totalTranscriptsEl = document.getElementById('totalTranscripts');
+        const streakDaysEl = document.getElementById('streakDays');
+        
+        if (totalCharsEl) totalCharsEl.textContent = totalChars.toLocaleString();
+        if (totalWordsEl) totalWordsEl.textContent = totalWords.toLocaleString();
+        if (totalTranscriptsEl) totalTranscriptsEl.textContent = transcripts.length;
+        if (streakDaysEl) streakDaysEl.textContent = 1;
+    } catch (e) {
+        console.error('Load stats error:', e);
+    }
 }
 
-function stopRecordingForCamera() {
-    if (!STATE.speechRecognition) return;
-    try { STATE.speechRecognition.stop(); } catch (e) {}
-    STATE.isRecording = false;
-    updateCameraStatus('Kamera aktif (gestur: 👍️ mulai)', true);
+function saveTranscript(textareaId, controlMethod) {
+    try {
+        const textarea = document.getElementById(textareaId);
+        if (!textarea || !textarea.value) return;
+        
+        const transcripts = JSON.parse(localStorage.getItem('voicescript_data') || '[]');
+        transcripts.push({
+            id: Date.now(),
+            text: textarea.value,
+            control_method: controlMethod,
+            created_at: new Date().toISOString()
+        });
+        localStorage.setItem('voicescript_data', JSON.stringify(transcripts));
+        loadStats();
+    } catch (e) {
+        console.error('Save transcript error:', e);
+    }
 }
 
-// ==================== TEXT ACTIONS ====================
-
+// ================================================
+// TEXT UTILITIES - START
+// ================================================
 function copyText(textareaId) {
     const textarea = document.getElementById(textareaId);
     if (!textarea || !textarea.value) return;
@@ -654,83 +342,491 @@ function downloadText(textareaId, filename) {
     URL.revokeObjectURL(url);
 }
 
-function saveTranscript(textareaId, controlMethod) {
-    const textarea = document.getElementById(textareaId);
-    if (!textarea || !textarea.value) return;
-    const transcripts = JSON.parse(localStorage.getItem('voicescript_transcripts') || '[]');
-    transcripts.push({
-        id: Date.now(),
-        text: textarea.value,
-        control_method: controlMethod,
-        created_at: new Date().toISOString()
-    });
-    localStorage.setItem('voicescript_transcripts', JSON.stringify(transcripts));
-    loadStats();
+// ================================================
+// SPEECH RECOGNITION - START
+// ================================================
+function initSpeechRecognition() {
+    if (STATE.speechRecognition) return;
+    
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+        updateVoiceStatus('Browser tidak mendukung Speech Recognition', false);
+        return;
+    }
+    
+    STATE.speechRecognition = new SpeechRecognition();
+    STATE.speechRecognition.continuous = true;
+    STATE.speechRecognition.interimResults = true;
+    STATE.speechRecognition.lang = STATE.currentLanguage;
+
+    STATE.speechRecognition.onresult = function(event) {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript;
+        }
+        const textarea = document.getElementById('voiceTranscript');
+        if (textarea) textarea.value += transcript;
+        updateVoiceStatus('Mendengarkan...', true);
+    };
+
+    STATE.speechRecognition.onerror = function(e) {
+        if (e.error !== 'no-speech') {
+            updateVoiceStatus(`Error: ${e.error}`, false);
+        }
+    };
+
+    STATE.speechRecognition.onend = function() {
+        if (STATE.isRecording) {
+            try { STATE.speechRecognition.start(); } catch (e) {}
+        }
+    };
 }
 
-// ==================== EVENT LISTENERS ====================
-
-function initEventListeners() {
-    // Logout
-    DOM.sidebarLogoutBtn?.addEventListener('click', logout);
-    
-    // Sidebar navigation
-    DOM.sidebarLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            const pageId = link.dataset.page;
-            if (pageId) switchPage(pageId);
-        });
-    });
-    
-    // Bottom nav
-    DOM.bottomLinks.forEach(link => {
-        link.addEventListener('click', () => {
-            const pageId = link.dataset.page;
-            if (pageId) switchPage(pageId);
-        });
-    });
-    
-    // Shortcut cards
-    DOM.shortcutCards.forEach(card => {
-        card.addEventListener('click', () => {
-            const pageId = card.dataset.page;
-            if (pageId) switchPage(pageId);
-        });
-    });
-    
-    // Voice to Text controls
-    DOM.languageSelectVoice?.addEventListener('change', (e) => {
-        STATE.currentLanguage = e.target.value;
-    });
-    DOM.voiceMicBtn?.addEventListener('click', toggleRecording);
-    DOM.copyVoiceBtn?.addEventListener('click', () => copyText('voiceTranscript'));
-    DOM.clearVoiceBtn?.addEventListener('click', () => clearText('voiceTranscript'));
-    DOM.downloadVoiceBtn?.addEventListener('click', () => downloadText('voiceTranscript', `voicescript-${Date.now()}.txt`));
-    DOM.saveVoiceBtn?.addEventListener('click', () => saveTranscript('voiceTranscript', 'voice'));
-    
-    // Kamera Kontrol controls
-    DOM.toggleCameraBtn?.addEventListener('click', toggleCamera);
-    DOM.copyCameraBtn?.addEventListener('click', () => copyText('cameraTranscript'));
-    DOM.clearCameraBtn?.addEventListener('click', () => clearText('cameraTranscript'));
-    DOM.downloadCameraBtn?.addEventListener('click', () => downloadText('cameraTranscript', `voicescript-gesture-${Date.now()}.txt`));
-    DOM.saveCameraBtn?.addEventListener('click', () => saveTranscript('cameraTranscript', 'gesture'));
-    
-    // Belajar Isyarat controls
-    DOM.lessonBtns.forEach(btn => {
-        btn.addEventListener('click', () => switchLesson(btn.dataset.lesson));
-    });
-    DOM.toggleFeedbackCamBtn?.addEventListener('click', toggleFeedbackCamera);
-    
-    // Cleanup on page unload
-    window.addEventListener('beforeunload', cleanupCurrentPage);
+function toggleRecording() {
+    if (STATE.isRecording) {
+        stopRecording();
+    } else {
+        startRecording();
+    }
 }
 
-// ==================== INIT ====================
-
-async function init() {
-    console.log('Initializing VoiceScript Ultimate...');
-    initEventListeners();
-    await safeCheckAuth();
+function startRecording() {
+    initSpeechRecognition();
+    if (!STATE.speechRecognition) return;
+    
+    STATE.speechRecognition.lang = STATE.currentLanguage;
+    STATE.speechRecognition.start();
+    STATE.isRecording = true;
+    
+    const micBtn = document.getElementById('voiceMicBtn');
+    if (micBtn) micBtn.classList.add('recording');
+    
+    const micStatus = document.getElementById('voiceMicStatus');
+    if (micStatus) micStatus.textContent = 'Mendengarkan...';
+    
+    updateVoiceStatus('Merekam suara', true);
 }
 
-document.addEventListener('DOMContentLoaded', init);
+function stopRecording() {
+    if (!STATE.speechRecognition) return;
+    try { STATE.speechRecognition.stop(); } catch (e) {}
+    STATE.isRecording = false;
+    
+    const micBtn = document.getElementById('voiceMicBtn');
+    if (micBtn) micBtn.classList.remove('recording');
+    
+    const micStatus = document.getElementById('voiceMicStatus');
+    if (micStatus) micStatus.textContent = 'Klik untuk mulai merekam';
+    
+    updateVoiceStatus('Siap merekam', false);
+}
+
+function updateVoiceStatus(text, isActive) {
+    const statusText = document.getElementById('voiceStatusText');
+    const statusDot = document.getElementById('voiceStatusDot');
+    
+    if (statusText) statusText.textContent = text;
+    if (statusDot) {
+        statusDot.classList.toggle('recording', isActive);
+    }
+}
+
+// ================================================
+// CAMERA & GESTURE - START
+// ================================================
+async function initHands() {
+    if (STATE.hands || !window.Hands) return;
+    
+    try {
+        const hands = new Hands({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+        });
+        hands.setOptions({
+            maxNumHands: 1,
+            modelComplexity: 0,
+            minDetectionConfidence: 0.7,
+            minTrackingConfidence: 0.5
+        });
+        hands.onResults(onHandsResults);
+        STATE.hands = hands;
+    } catch (e) {
+        console.error('MediaPipe init error:', e);
+    }
+}
+
+async function initFeedbackHands() {
+    if (STATE.feedbackHands || !window.Hands) return;
+    
+    try {
+        const hands = new Hands({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+        });
+        hands.setOptions({
+            maxNumHands: 1,
+            modelComplexity: 0,
+            minDetectionConfidence: 0.7,
+            minTrackingConfidence: 0.5
+        });
+        hands.onResults(onFeedbackHandsResults);
+        STATE.feedbackHands = hands;
+    } catch (e) {
+        console.error('MediaPipe feedback init error:', e);
+    }
+}
+
+function onHandsResults(results) {
+    const canvas = document.getElementById('handsCanvas');
+    if (!canvas) return;
+    
+    const canvasCtx = canvas.getContext('2d');
+    canvasCtx.save();
+    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (results.multiHandLandmarks) {
+        for (const landmarks of results.multiHandLandmarks) {
+            if (window.drawConnectors) drawConnectors(canvasCtx, landmarks, window.HAND_CONNECTIONS, { color: '#7c6dfa', lineWidth: 2 });
+            if (window.drawLandmarks) drawLandmarks(canvasCtx, landmarks, { color: '#ffffff', lineWidth: 1, radius: 3 });
+            
+            const gesture = detectGesture(landmarks);
+            if (gesture) handleGesture(gesture);
+        }
+    }
+    canvasCtx.restore();
+}
+
+function onFeedbackHandsResults(results) {
+    const canvas = document.getElementById('feedbackHandsCanvas');
+    if (!canvas) return;
+    
+    const canvasCtx = canvas.getContext('2d');
+    canvasCtx.save();
+    canvasCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+    if (results.multiHandLandmarks) {
+        for (const landmarks of results.multiHandLandmarks) {
+            if (window.drawConnectors) drawConnectors(canvasCtx, landmarks, window.HAND_CONNECTIONS, { color: '#7c6dfa', lineWidth: 2 });
+            if (window.drawLandmarks) drawLandmarks(canvasCtx, landmarks, { color: '#ffffff', lineWidth: 1, radius: 3 });
+            
+            checkLessonFeedback(landmarks);
+        }
+    }
+    canvasCtx.restore();
+}
+
+function detectGesture(landmarks) {
+    try {
+        const thumbTip = landmarks[4];
+        const indexTip = landmarks[8];
+        const middleTip = landmarks[12];
+        const ringTip = landmarks[16];
+        const pinkyTip = landmarks[20];
+        const wrist = landmarks[0];
+
+        const thumbUp = thumbTip.y < indexTip.y && thumbTip.y < middleTip.y;
+        const indexUp = indexTip.y < landmarks[6].y;
+        const middleUp = middleTip.y < landmarks[10].y;
+        const ringUp = ringTip.y < landmarks[14].y;
+        const pinkyUp = pinkyTip.y < landmarks[18].y;
+
+        if (thumbUp && !indexUp && !middleUp && !ringUp && !pinkyUp) return 'thumbsup';
+        if (indexUp && middleUp && ringUp && pinkyUp) return 'open';
+        if (!indexUp && !middleUp && !ringUp && !pinkyUp) return 'fist';
+    } catch (e) {
+        console.error('Detect gesture error:', e);
+    }
+    return null;
+}
+
+function handleGesture(gesture) {
+    const now = Date.now();
+    if (now - STATE.lastGestureTime < 1500) return;
+    STATE.lastGestureTime = now;
+
+    const statusEl = document.getElementById('cameraGestureStatus');
+    if (statusEl) {
+        statusEl.textContent = `Terdeteksi: ${gesture === 'thumbsup' ? '👍 Mulai Merekam' : gesture === 'open' ? '🖐️ Berhenti' : '✊ Hapus'}`;
+        statusEl.classList.add('detected');
+        setTimeout(() => statusEl.classList.remove('detected'), 500);
+    }
+
+    if (gesture === 'thumbsup') {
+        if (!STATE.isRecording) toggleRecordingForCamera();
+    } else if (gesture === 'open') {
+        if (STATE.isRecording) toggleRecordingForCamera();
+    } else if (gesture === 'fist') {
+        const textarea = document.getElementById('cameraTranscript');
+        if (textarea) textarea.value = '';
+    }
+}
+
+async function startCamera() {
+    if (STATE.isCameraOn) return;
+    
+    await initHands();
+    
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { width: { ideal: 640 }, height: { ideal: 480 } }
+        });
+        STATE.mediaStream = stream;
+        
+        const webcam = document.getElementById('webcam');
+        if (webcam) webcam.srcObject = stream;
+
+        const canvas = document.getElementById('handsCanvas');
+        if (canvas) {
+            canvas.width = 640;
+            canvas.height = 480;
+        }
+
+        STATE.isCameraOn = true;
+        startManualFrameLoop();
+        updateCameraStatus('Kamera aktif', true);
+        
+        const statusEl = document.getElementById('cameraGestureStatus');
+        if (statusEl) statusEl.textContent = 'Kamera aktif, tunjukkan gestur';
+    } catch (e) {
+        console.error('Start camera error:', e);
+        updateCameraStatus(`Kamera error: ${e.message}`, false);
+    }
+}
+
+function stopCamera() {
+    if (!STATE.isCameraOn) return;
+    
+    if (STATE.mediaStream) {
+        STATE.mediaStream.getTracks().forEach(track => track.stop());
+        STATE.mediaStream = null;
+    }
+    
+    if (STATE.animationFrameId) {
+        cancelAnimationFrame(STATE.animationFrameId);
+        STATE.animationFrameId = null;
+    }
+    
+    const webcam = document.getElementById('webcam');
+    if (webcam) webcam.srcObject = null;
+    
+    STATE.isCameraOn = false;
+    updateCameraStatus('Klik tombol untuk menyalakan kamera', false);
+    
+    const statusEl = document.getElementById('cameraGestureStatus');
+    if (statusEl) statusEl.textContent = 'Kamera belum aktif';
+}
+
+function toggleCamera() {
+    if (STATE.isCameraOn) {
+        stopCamera();
+    } else {
+        startCamera();
+    }
+}
+
+function startManualFrameLoop() {
+    const loop = async () => {
+        if (!STATE.isCameraOn) return;
+        
+        const now = Date.now();
+        if (now - STATE.lastFrameTime >= 200) {
+            try {
+                const webcam = document.getElementById('webcam');
+                if (STATE.hands && webcam && webcam.readyState === 4) {
+                    await STATE.hands.send({ image: webcam });
+                }
+            } catch (e) {}
+            STATE.lastFrameTime = now;
+        }
+        
+        STATE.animationFrameId = requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+}
+
+async function startFeedbackCamera() {
+    if (STATE.isFeedbackCameraOn) return;
+    
+    await initFeedbackHands();
+    
+    try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+            video: { width: { ideal: 480 }, height: { ideal: 360 } }
+        });
+        STATE.feedbackMediaStream = stream;
+        
+        const webcam = document.getElementById('feedbackWebcam');
+        if (webcam) webcam.srcObject = stream;
+
+        const canvas = document.getElementById('feedbackHandsCanvas');
+        if (canvas) {
+            canvas.width = 480;
+            canvas.height = 360;
+        }
+
+        STATE.isFeedbackCameraOn = true;
+        startFeedbackFrameLoop();
+        
+        const feedbackText = document.getElementById('feedbackText');
+        if (feedbackText) {
+            feedbackText.textContent = STATE.selectedLessonItem 
+                ? `Coba tunjukkan isyarat untuk "${STATE.selectedLessonItem}"` 
+                : 'Pilih huruf terlebih dahulu';
+        }
+    } catch (e) {
+        console.error('Start feedback camera error:', e);
+        const feedbackText = document.getElementById('feedbackText');
+        if (feedbackText) feedbackText.textContent = `Kamera error: ${e.message}`;
+    }
+}
+
+function stopFeedbackCamera() {
+    if (!STATE.isFeedbackCameraOn) return;
+    
+    if (STATE.feedbackMediaStream) {
+        STATE.feedbackMediaStream.getTracks().forEach(track => track.stop());
+        STATE.feedbackMediaStream = null;
+    }
+    
+    if (STATE.feedbackAnimationFrameId) {
+        cancelAnimationFrame(STATE.feedbackAnimationFrameId);
+        STATE.feedbackAnimationFrameId = null;
+    }
+    
+    const webcam = document.getElementById('feedbackWebcam');
+    if (webcam) webcam.srcObject = null;
+    
+    STATE.isFeedbackCameraOn = false;
+}
+
+function toggleFeedbackCamera() {
+    if (STATE.isFeedbackCameraOn) {
+        stopFeedbackCamera();
+    } else {
+        startFeedbackCamera();
+    }
+}
+
+function startFeedbackFrameLoop() {
+    const loop = async () => {
+        if (!STATE.isFeedbackCameraOn) return;
+        
+        const now = Date.now();
+        if (now - STATE.lastFeedbackFrameTime >= 200) {
+            try {
+                const webcam = document.getElementById('feedbackWebcam');
+                if (STATE.feedbackHands && webcam && webcam.readyState === 4) {
+                    await STATE.feedbackHands.send({ image: webcam });
+                }
+            } catch (e) {}
+            STATE.lastFeedbackFrameTime = now;
+        }
+        
+        STATE.feedbackAnimationFrameId = requestAnimationFrame(loop);
+    };
+    requestAnimationFrame(loop);
+}
+
+function updateCameraStatus(text, isActive) {
+    const statusText = document.getElementById('cameraStatusText');
+    const statusDot = document.getElementById('cameraStatusDot');
+    
+    if (statusText) statusText.textContent = text;
+    if (statusDot) {
+        statusDot.classList.toggle('recording', isActive);
+    }
+}
+
+function toggleRecordingForCamera() {
+    if (STATE.isRecording) {
+        stopRecordingForCamera();
+    } else {
+        startRecordingForCamera();
+    }
+}
+
+function startRecordingForCamera() {
+    initSpeechRecognition();
+    if (!STATE.speechRecognition) return;
+    
+    STATE.speechRecognition.lang = 'id-ID';
+    STATE.speechRecognition.onresult = function(event) {
+        let transcript = '';
+        for (let i = event.resultIndex; i < event.results.length; i++) {
+            transcript += event.results[i][0].transcript;
+        }
+        const textarea = document.getElementById('cameraTranscript');
+        if (textarea) textarea.value += transcript;
+    };
+    
+    STATE.speechRecognition.start();
+    STATE.isRecording = true;
+    updateCameraStatus('Merekam suara (gestur: 🖐️ berhenti)', true);
+}
+
+function stopRecordingForCamera() {
+    if (!STATE.speechRecognition) return;
+    try { STATE.speechRecognition.stop(); } catch (e) {}
+    STATE.isRecording = false;
+    updateCameraStatus('Kamera aktif (gestur: 👍️ mulai)', true);
+}
+
+// ================================================
+// LESSONS - START
+// ================================================
+function renderLessons() {
+    Object.entries(LESSON_DATA).forEach(([type, items]) => {
+        const grid = document.getElementById(`${type}Grid`);
+        if (!grid) return;
+        
+        grid.innerHTML = '';
+        items.forEach(item => {
+            const div = document.createElement('div');
+            div.className = 'lesson-item';
+            div.innerHTML = `<span>${item}</span><small>${item}</small>`;
+            div.addEventListener('click', () => selectLessonItem(type, item, div));
+            grid.appendChild(div);
+        });
+    });
+}
+
+function selectLessonItem(type, item, element) {
+    document.querySelectorAll('.lesson-item').forEach(el => el.classList.remove('active'));
+    element.classList.add('active');
+    STATE.selectedLessonItem = item;
+    
+    const feedbackText = document.getElementById('feedbackText');
+    if (feedbackText) {
+        feedbackText.textContent = `Coba tunjukkan isyarat untuk "${item}"`;
+    }
+}
+
+function switchLesson(lesson) {
+    STATE.currentLesson = lesson;
+    
+    document.querySelectorAll('.lesson-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lesson === lesson);
+    });
+    
+    const alphabetGrid = document.getElementById('alphabetGrid');
+    const numbersGrid = document.getElementById('numbersGrid');
+    const greetingsGrid = document.getElementById('greetingsGrid');
+    
+    if (alphabetGrid) alphabetGrid.classList.toggle('hidden', lesson !== 'alphabet');
+    if (numbersGrid) numbersGrid.classList.toggle('hidden', lesson !== 'numbers');
+    if (greetingsGrid) greetingsGrid.classList.toggle('hidden', lesson !== 'greetings');
+}
+
+function checkLessonFeedback(landmarks) {
+    if (!STATE.selectedLessonItem) return;
+    
+    const gesture = detectGesture(landmarks);
+    const isCorrect = gesture !== null;
+    
+    const feedbackText = document.getElementById('feedbackText');
+    if (feedbackText) {
+        feedbackText.classList.remove('correct', 'incorrect');
+        feedbackText.classList.add(isCorrect ? 'correct' : 'incorrect');
+        feedbackText.textContent = isCorrect 
+            ? `Bagus! Isyarat "${STATE.selectedLessonItem}" terdeteksi!` 
+            : `Coba lagi untuk "${STATE.selectedLessonItem}"`;
+    }
+}
