@@ -22,9 +22,38 @@
                     </svg>
                     <h1>VoiceScript + Sign Language AI</h1>
                 </div>
-                <p class="tagline">Speak to Text with Touchless Gesture Control</p>
+                <p class="tagline" id="loginTagline">Silakan login untuk melanjutkan</p>
             </div>
             
+            <!-- MODE A: VERIFIKASI AKUN -->
+            <form id="verifyForm" class="login-form" style="display: none;">
+                <p style="text-align: center; color: var(--text-secondary); margin-bottom: 1rem;">Silakan verifikasi akun Anda</p>
+                <div class="form-group">
+                    <label for="verifyEmail">Email yang didaftarkan</label>
+                    <input type="email" id="verifyEmail" name="verifyEmail" required placeholder="Masukkan email Anda">
+                </div>
+                
+                <div class="form-group">
+                    <label for="verifyCode">Kode Verifikasi (Nomor Acak)</label>
+                    <div class="otp-container">
+                        <input type="text" maxlength="1" class="otp-input" data-index="0" pattern="[0-9]" placeholder="0">
+                        <input type="text" maxlength="1" class="otp-input" data-index="1" pattern="[0-9]" placeholder="0">
+                        <input type="text" maxlength="1" class="otp-input" data-index="2" pattern="[0-9]" placeholder="0">
+                        <input type="text" maxlength="1" class="otp-input" data-index="3" pattern="[0-9]" placeholder="0">
+                        <input type="text" maxlength="1" class="otp-input" data-index="4" pattern="[0-9]" placeholder="0">
+                        <input type="text" maxlength="1" class="otp-input" data-index="5" pattern="[0-9]" placeholder="0">
+                    </div>
+                </div>
+                
+                <div id="verifyError" class="error-message" style="display: none;"></div>
+                <div id="verifySuccess" class="success-message" style="display: none;"></div>
+                
+                <button type="submit" class="btn-primary" id="verifyBtn">Verifikasi</button>
+                
+                <button type="button" class="resend-btn" id="resendVerifyBtn" style="margin-top: 0.5rem;">Kirim Ulang Kode</button>
+            </form>
+            
+            <!-- MODE B: LOGIN UTAMA -->
             <form id="loginForm" class="login-form">
                 <div class="form-group">
                     <label for="email">Email / Username</label>
@@ -41,17 +70,17 @@
                 <button type="submit" class="btn-primary">Login</button>
             </form>
             
+            <div class="login-info" id="demoInfo" style="display: none;">
+                <p>Akun Demo:</p>
+                <p class="demo-cred">admin@voicescript.com | password</p>
+            </div>
+            
             <div class="login-footer">
-            <p>Belum punya akun? <a href="register.html">Daftar disini</a></p>
-        </div>
-        
-        <div class="login-info">
-            <p>Akun Demo:</p>
-            <p class="demo-cred">admin@voicescript.com | password</p>
+                <p id="loginFooter">Belum punya akun? <a href="register.html">Daftar disini</a></p>
+            </div>
         </div>
     </div>
-</div>
-
-<script src="js/login.js"></script>
+    
+    <script src="js/login.js"></script>
 </body>
 </html>

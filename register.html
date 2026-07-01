@@ -58,7 +58,7 @@
             
             <button class="google-btn">
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <path d="M12 22C17.523 22 22 17.523 22 12S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10Z" stroke="#4285F4" stroke-width="1.5"/>
+                    <path d="M12 22C17.523 22 22 17.523 22 12S17.523 2 12 2 6.477 2 12s4.477 10 10 10Z" stroke="#4285F4" stroke-width="1.5"/>
                     <path d="M12 6.5c1.8 0 3.3.7 4.5 1.9L18 6c-1.7-1.5-3.9-2.4-6-2.4C7.5 3.6 4.8 5.7 3.7 8.8l2 1.4C6.9 8 9.2 6.5 12 6.5Z" fill="#EA4335"/>
                     <path d="M21.3 12.2c0-.8-.1-1.5-.3-2.2H12v4.4h5.2c-.2 1.3-1 2.4-2.1 3.1l1.7 1.3c1.4-1.3 2.5-3.3 2.5-6.6Z" fill="#4285F4"/>
                     <path d="M4.3 14.5c-.8-1.3-.8-2.7 0-4L2.3 9C.6 12 .6 15 2.3 17.5l2-1.4C4.4 15.5 4.3 15 4.3 14.5Z" fill="#FBBC05"/>
@@ -114,8 +114,8 @@
                     successEl.textContent = data.message;
                     successEl.style.display = 'block';
                     setTimeout(() => {
-                        window.location.href = 'verify.html?email=' + encodeURIComponent(email);
-                    }, 2000);
+                        window.location.href = 'login.html?status=need_verification&email=' + encodeURIComponent(email);
+                    }, 2500);
                 } else {
                     errorEl.textContent = data.message;
                     errorEl.style.display = 'block';
