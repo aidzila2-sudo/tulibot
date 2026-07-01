@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>VoiceScript + Sign Language AI - Verifikasi Email</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <div class="logo">
+                    <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 14C14.2091 14 16 12.2091 16 10V6C16 3.79086 14.2091 2 12 2C9.79086 2 8 3.79086 8 6V10C8 12.2091 9.79086 14 12 14Z" stroke="#7c6dfa" stroke-width="2"/>
+                        <path d="M19 10V11C19 14.866 15.866 18 12 18C8.13401 18 5 14.866 5 11V10" stroke="#7c6dfa" stroke-width="2"/>
+                        <path d="M12 18V22" stroke="#7c6dfa" stroke-width="2"/>
+                        <path d="M8 22H16" stroke="#7c6dfa" stroke-width="2"/>
+                    </svg>
+                    <h1>Verifikasi Email</h1>
+                </div>
+                <p class="tagline">Silakan masukkan kode verifikasi yang telah dikirimkan ke email Anda</p>
+            </div>
+            
+            <form id="verifyForm" class="login-form">
+                <div class="otp-container">
+                    <input type="text" maxlength="1" class="otp-input" data-index="0" pattern="[0-9]">
+                    <input type="text" maxlength="1" class="otp-input" data-index="1" pattern="[0-9]">
+                    <input type="text" maxlength="1" class="otp-input" data-index="2" pattern="[0-9]">
+                    <input type="text" maxlength="1" class="otp-input" data-index="3" pattern="[0-9]">
+                    <input type="text" maxlength="1" class="otp-input" data-index="4" pattern="[0-9]">
+                    <input type="text" maxlength="1" class="otp-input" data-index="5" pattern="[0-9]">
+                </div>
+                
+                <div id="verifyError" class="error-message" style="display: none;"></div>
+                <div id="verifySuccess" class="success-message" style="display: none;"></div>
+                
+                <button type="submit" class="btn-primary">Verifikasi</button>
+                
+                <button type="button" class="resend-btn" id="resendBtn">Kirim Ulang Kode</button>
+            </form>
+            
+            <div class="login-footer">
+                <p>Belum punya akun? <a href="register.html">Daftar disini</a> | Sudah punya akun? <a href="login.html">Login disini</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Get email from URL params
+        function getUrlParam(param) {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get(param);
+        }
+        
+        const email = getUrlParam('email');
+        
+        // OTP input handling
+        const otpInputs = document.querySelectorAll('.otp-input');
+        
+        otpInputs.forEach((input, index) => {
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length === 1 && index < otpInputs.length - 1) {
+                    otpInputs[index + 1].focus();
+                }
+            });
+            
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && index > 0 && !e.target.value) {
+                    otpInputs[index - 1].focus();
+                }
+            });
+        });
+        
+        document.getElementById('verifyForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const code = Array.from(otpInputs).map(input => input.value).join('');
+            const errorEl = document.getElementById('verifyError');
+            const successEl = document.getElementById('verifySuccess');
+            
+            errorEl.style.display = 'none';
+            successEl.style.display = 'none';
+            
+            if (code.length !== 6) {
+                errorEl.textContent = 'Silakan masukkan kode verifikasi 6 digit!';
+                errorEl.style.display = 'block';
+                return;
+            }
+            
+            try {
+                const response = await fetch('../backend/api/verify.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, code })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    successEl.textContent = data.message;
+                    successEl.style.display = 'block';
+                    setTimeout(() => {
+                        window.location.href = 'login.html';
+                    }, 2000);
+                } else {
+                    errorEl.textContent = data.message;
+                    errorEl.style.display = 'block';
+                }
+            } catch (error) {
+                errorEl.textContent = 'Terjadi kesalahan pada server!';
+                errorEl.style.display = 'block';
+            }
+        });
+        
+        document.getElementById('resendBtn').addEventListener('click', async function() {
+            const errorEl = document.getElementById('verifyError');
+            const successEl = document.getElementById('verifySuccess');
+            const resendBtn = document.getElementById('resendBtn');
+            
+            errorEl.style.display = 'none';
+            successEl.style.display = 'none';
+            resendBtn.disabled = true;
+            resendBtn.textContent = 'Mengirim...';
+            
+            try {
+                const response = await fetch('../backend/api/register_process.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ resend: true, email })
+                });
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    successEl.textContent = data.message;
+                    successEl.style.display = 'block';
+                } else {
+                    errorEl.textContent = data.message;
+                    errorEl.style.display = 'block';
+                }
+            } catch (error) {
+                errorEl.textContent = 'Terjadi kesalahan pada server!';
+                errorEl.style.display = 'block';
+            }
+            
+            setTimeout(() => {
+                resendBtn.disabled = false;
+                resendBtn.textContent = 'Kirim Ulang Kode';
+            }, 30000);
+        });
+    </script>
+</body>
+</html>

@@ -428,6 +428,188 @@
             text-align: center;
         }
 
+        /* Text-to-Speech Section */
+        .tts-section {
+            background: var(--bg-secondary);
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        .tts-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .tts-header h3 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--accent-primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .tts-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .tts-btn {
+            padding: 12px 20px;
+            border-radius: 12px;
+            font-family: var(--font-sans);
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+        }
+
+        .tts-btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+        }
+
+        .tts-btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(124, 109, 250, 0.35);
+        }
+
+        .tts-btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-color);
+        }
+
+        .tts-btn-secondary:hover {
+            border-color: var(--accent-primary);
+            color: var(--accent-primary);
+        }
+
+        .tts-btn-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--accent-danger);
+            border: 1px solid var(--accent-danger);
+        }
+
+        .tts-btn-danger:hover {
+            background: var(--accent-danger);
+            color: white;
+        }
+
+        .tts-sliders-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .slider-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .slider-group label {
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .slider-group label .slider-value {
+            font-family: var(--font-mono);
+            color: var(--accent-primary);
+        }
+
+        /* Custom Range Slider */
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: var(--bg-tertiary);
+            outline: none;
+            cursor: pointer;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 0 4px rgba(124, 109, 250, 0.2);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            cursor: pointer;
+            border: none;
+            transition: all 0.2s ease;
+        }
+
+        input[type="range"]::-moz-range-thumb:hover {
+            transform: scale(1.2);
+            box-shadow: 0 0 0 4px rgba(124, 109, 250, 0.2);
+        }
+
+        /* Voice Selector */
+        .voice-selector {
+            width: 100%;
+        }
+
+        .voice-selector select {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: 10px;
+            color: var(--text-primary);
+            font-family: var(--font-sans);
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .voice-selector select:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(124, 109, 250, 0.15);
+        }
+
+        /* Shake Animation */
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.5s ease-in-out;
+        }
+
         /* Buttons */
         .btn-primary {
             padding: 14px 24px;
@@ -1288,6 +1470,72 @@
                             <span id="voiceStatusText">Siap merekam. Klik tombol mic.</span>
                         </div>
                         <textarea id="voiceTranscript" class="transcript-area" placeholder="Hasil transkripsi akan muncul di sini..."></textarea>
+                        
+                        <!-- TTS Section -->
+                        <div class="tts-section">
+                            <div class="tts-header">
+                                <h3>
+                                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                                        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                                        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                                    </svg>
+                                    Text to Speech
+                                </h3>
+                                <div class="tts-controls">
+                                    <button class="tts-btn tts-btn-primary" id="voiceTtsPlayBtn">
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <polygon points="5 3 19 12 5 21 5 3"/>
+                                        </svg>
+                                        Putar Suara
+                                    </button>
+                                    <button class="tts-btn tts-btn-secondary" id="voiceTtsPauseBtn" disabled>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="6" y="4" width="4" height="16"/>
+                                            <rect x="14" y="4" width="4" height="16"/>
+                                        </svg>
+                                        Pause
+                                    </button>
+                                    <button class="tts-btn tts-btn-danger" id="voiceTtsStopBtn" disabled>
+                                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                        </svg>
+                                        Stop
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="tts-sliders-container">
+                                <div class="slider-group">
+                                    <label>
+                                        Kecepatan (Rate)
+                                        <span class="slider-value" id="voiceRateValue">1.0</span>
+                                    </label>
+                                    <input type="range" id="voiceRateSlider" min="0.5" max="2" step="0.1" value="1">
+                                </div>
+                                <div class="slider-group">
+                                    <label>
+                                        Nada (Pitch)
+                                        <span class="slider-value" id="voicePitchValue">1.0</span>
+                                    </label>
+                                    <input type="range" id="voicePitchSlider" min="0" max="2" step="0.1" value="1">
+                                </div>
+                                <div class="slider-group">
+                                    <label>
+                                        Volume
+                                        <span class="slider-value" id="voiceVolumeValue">1.0</span>
+                                    </label>
+                                    <input type="range" id="voiceVolumeSlider" min="0" max="1" step="0.1" value="1">
+                                </div>
+                            </div>
+                            
+                            <div class="voice-selector">
+                                <select id="voiceVoiceSelect">
+                                    <option value="">Memuat suara...</option>
+                                </select>
+                            </div>
+                        </div>
+                        
                         <div class="action-buttons">
                             <button id="copyVoiceBtn" class="btn-secondary">
                                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -1370,6 +1618,71 @@
                                 
                                 <!-- Transcript Area -->
                                 <textarea id="cameraTranscript" class="transcript-area" placeholder="Teks akan muncul ketika Anda menggunakan gestur..."></textarea>
+                                
+                                <!-- TTS Section -->
+                                <div class="tts-section">
+                                    <div class="tts-header">
+                                        <h3>
+                                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+                                                <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+                                                <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+                                            </svg>
+                                            Text to Speech
+                                        </h3>
+                                        <div class="tts-controls">
+                                            <button class="tts-btn tts-btn-primary" id="cameraTtsPlayBtn">
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <polygon points="5 3 19 12 5 21 5 3"/>
+                                                </svg>
+                                                Putar Suara
+                                            </button>
+                                            <button class="tts-btn tts-btn-secondary" id="cameraTtsPauseBtn" disabled>
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <rect x="6" y="4" width="4" height="16"/>
+                                                    <rect x="14" y="4" width="4" height="16"/>
+                                                </svg>
+                                                Pause
+                                            </button>
+                                            <button class="tts-btn tts-btn-danger" id="cameraTtsStopBtn" disabled>
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                                                </svg>
+                                                Stop
+                                            </button>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="tts-sliders-container">
+                                        <div class="slider-group">
+                                            <label>
+                                                Kecepatan (Rate)
+                                                <span class="slider-value" id="cameraRateValue">1.0</span>
+                                            </label>
+                                            <input type="range" id="cameraRateSlider" min="0.5" max="2" step="0.1" value="1">
+                                        </div>
+                                        <div class="slider-group">
+                                            <label>
+                                                Nada (Pitch)
+                                                <span class="slider-value" id="cameraPitchValue">1.0</span>
+                                            </label>
+                                            <input type="range" id="cameraPitchSlider" min="0" max="2" step="0.1" value="1">
+                                        </div>
+                                        <div class="slider-group">
+                                            <label>
+                                                Volume
+                                                <span class="slider-value" id="cameraVolumeValue">1.0</span>
+                                            </label>
+                                            <input type="range" id="cameraVolumeSlider" min="0" max="1" step="0.1" value="1">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="voice-selector">
+                                        <select id="cameraVoiceSelect">
+                                            <option value="">Memuat suara...</option>
+                                        </select>
+                                    </div>
+                                </div>
                                 
                                 <!-- Action Buttons -->
                                 <div class="action-buttons">
@@ -1540,7 +1853,20 @@
             // Gesture debouncing state
             lastPredictedGesture: null,
             gestureConfidenceCounter: 0,
-            MIN_GESTURE_CONSISTENCY_FRAMES: 6 // Require 6 consistent frames before accepting
+            MIN_GESTURE_CONSISTENCY_FRAMES: 6, // Require 6 consistent frames before accepting
+            
+            // TTS State
+            ttsVoices: [],
+            voiceTts: {
+                utterance: null,
+                isPlaying: false,
+                isPaused: false
+            },
+            cameraTts: {
+                utterance: null,
+                isPlaying: false,
+                isPaused: false
+            }
         };
 
         // Lesson Data
@@ -1553,6 +1879,7 @@
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             attachEventListeners();
+            initTTS();
             checkAuth();
         });
 
@@ -1603,6 +1930,33 @@
             const saveVoiceBtn = document.getElementById('saveVoiceBtn');
             if (saveVoiceBtn) saveVoiceBtn.addEventListener('click', () => saveTranscript('voiceTranscript', 'voice'));
 
+            // Voice TTS Controls
+            const voiceTtsPlayBtn = document.getElementById('voiceTtsPlayBtn');
+            if (voiceTtsPlayBtn) voiceTtsPlayBtn.addEventListener('click', () => toggleTTS('voice'));
+            const voiceTtsPauseBtn = document.getElementById('voiceTtsPauseBtn');
+            if (voiceTtsPauseBtn) voiceTtsPauseBtn.addEventListener('click', () => pauseTTS('voice'));
+            const voiceTtsStopBtn = document.getElementById('voiceTtsStopBtn');
+            if (voiceTtsStopBtn) voiceTtsStopBtn.addEventListener('click', () => stopTTS('voice'));
+
+            const voiceRateSlider = document.getElementById('voiceRateSlider');
+            if (voiceRateSlider) {
+                voiceRateSlider.addEventListener('input', (e) => {
+                    document.getElementById('voiceRateValue').textContent = parseFloat(e.target.value).toFixed(1);
+                });
+            }
+            const voicePitchSlider = document.getElementById('voicePitchSlider');
+            if (voicePitchSlider) {
+                voicePitchSlider.addEventListener('input', (e) => {
+                    document.getElementById('voicePitchValue').textContent = parseFloat(e.target.value).toFixed(1);
+                });
+            }
+            const voiceVolumeSlider = document.getElementById('voiceVolumeSlider');
+            if (voiceVolumeSlider) {
+                voiceVolumeSlider.addEventListener('input', (e) => {
+                    document.getElementById('voiceVolumeValue').textContent = parseFloat(e.target.value).toFixed(1);
+                });
+            }
+
             // Camera Page
             const toggleCameraBtn = document.getElementById('toggleCameraBtn');
             if (toggleCameraBtn) toggleCameraBtn.addEventListener('click', toggleCamera);
@@ -1619,6 +1973,33 @@
             const saveCameraBtn = document.getElementById('saveCameraBtn');
             if (saveCameraBtn) saveCameraBtn.addEventListener('click', () => saveTranscript('cameraTranscript', 'gesture'));
 
+            // Camera TTS Controls
+            const cameraTtsPlayBtn = document.getElementById('cameraTtsPlayBtn');
+            if (cameraTtsPlayBtn) cameraTtsPlayBtn.addEventListener('click', () => toggleTTS('camera'));
+            const cameraTtsPauseBtn = document.getElementById('cameraTtsPauseBtn');
+            if (cameraTtsPauseBtn) cameraTtsPauseBtn.addEventListener('click', () => pauseTTS('camera'));
+            const cameraTtsStopBtn = document.getElementById('cameraTtsStopBtn');
+            if (cameraTtsStopBtn) cameraTtsStopBtn.addEventListener('click', () => stopTTS('camera'));
+
+            const cameraRateSlider = document.getElementById('cameraRateSlider');
+            if (cameraRateSlider) {
+                cameraRateSlider.addEventListener('input', (e) => {
+                    document.getElementById('cameraRateValue').textContent = parseFloat(e.target.value).toFixed(1);
+                });
+            }
+            const cameraPitchSlider = document.getElementById('cameraPitchSlider');
+            if (cameraPitchSlider) {
+                cameraPitchSlider.addEventListener('input', (e) => {
+                    document.getElementById('cameraPitchValue').textContent = parseFloat(e.target.value).toFixed(1);
+                });
+            }
+            const cameraVolumeSlider = document.getElementById('cameraVolumeSlider');
+            if (cameraVolumeSlider) {
+                cameraVolumeSlider.addEventListener('input', (e) => {
+                    document.getElementById('cameraVolumeValue').textContent = parseFloat(e.target.value).toFixed(1);
+                });
+            }
+
             // Lesson Page
             document.querySelectorAll('.lesson-btn').forEach(btn => {
                 btn.addEventListener('click', () => switchLesson(btn.dataset.lesson));
@@ -1626,6 +2007,203 @@
 
             const toggleFeedbackCamBtn = document.getElementById('toggleFeedbackCamBtn');
             if (toggleFeedbackCamBtn) toggleFeedbackCamBtn.addEventListener('click', toggleFeedbackCamera);
+        }
+
+        // TTS Functions
+        function initTTS() {
+            if (!window.speechSynthesis) {
+                console.log('Speech synthesis not supported');
+                return;
+            }
+            
+            // Load voices
+            const loadVoices = () => {
+                STATE.ttsVoices = window.speechSynthesis.getVoices();
+                populateVoiceSelectors();
+            };
+            loadVoices();
+            if (speechSynthesis.onvoiceschanged !== undefined) {
+                speechSynthesis.onvoiceschanged = loadVoices;
+            }
+        }
+
+        function populateVoiceSelectors() {
+            const voiceSelectors = ['voiceVoiceSelect', 'cameraVoiceSelect'];
+            
+            voiceSelectors.forEach(selectorId => {
+                const select = document.getElementById(selectorId);
+                if (!select) return;
+                
+                select.innerHTML = '';
+                
+                // Sort voices: Indonesian first, then others
+                const sortedVoices = [...STATE.ttsVoices].sort((a, b) => {
+                    const aIndo = a.lang.includes('id-ID');
+                    const bIndo = b.lang.includes('id-ID');
+                    if (aIndo && !bIndo) return -1;
+                    if (!aIndo && bIndo) return 1;
+                    return a.name.localeCompare(b.name);
+                });
+                
+                sortedVoices.forEach((voice, index) => {
+                    const option = document.createElement('option');
+                    option.value = index;
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    if (voice.lang.includes('id-ID')) {
+                        option.selected = true;
+                    }
+                    select.appendChild(option);
+                });
+            });
+        }
+
+        function toggleTTS(page) {
+            const ttsState = page === 'voice' ? STATE.voiceTts : STATE.cameraTts;
+            const transcriptId = page === 'voice' ? 'voiceTranscript' : 'cameraTranscript';
+            const playBtn = document.getElementById(`${page}TtsPlayBtn`);
+            const pauseBtn = document.getElementById(`${page}TtsPauseBtn`);
+            const stopBtn = document.getElementById(`${page}TtsStopBtn`);
+            
+            const text = document.getElementById(transcriptId).value.trim();
+            if (!text) {
+                // Shake effect
+                const btn = document.getElementById(`${page}TtsPlayBtn`);
+                btn.classList.add('shake');
+                setTimeout(() => btn.classList.remove('shake'), 500);
+                return;
+            }
+            
+            if (ttsState.isPaused) {
+                window.speechSynthesis.resume();
+                ttsState.isPaused = false;
+                ttsState.isPlaying = true;
+                if (playBtn) playBtn.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="6" y="4" width="4" height="16"/>
+                        <rect x="14" y="4" width="4" height="16"/>
+                    </svg>
+                    Pause
+                `;
+                if (pauseBtn) pauseBtn.disabled = false;
+                if (stopBtn) stopBtn.disabled = false;
+                return;
+            }
+            
+            if (ttsState.isPlaying) {
+                pauseTTS(page);
+                return;
+            }
+            
+            // Start playing
+            window.speechSynthesis.cancel();
+            
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            // Get voice
+            const voiceSelect = document.getElementById(`${page}VoiceSelect`);
+            if (voiceSelect && voiceSelect.value !== '' && STATE.ttsVoices[voiceSelect.value]) {
+                utterance.voice = STATE.ttsVoices[voiceSelect.value];
+            }
+            
+            // Get settings
+            const rateSlider = document.getElementById(`${page}RateSlider`);
+            const pitchSlider = document.getElementById(`${page}PitchSlider`);
+            const volumeSlider = document.getElementById(`${page}VolumeSlider`);
+            
+            utterance.rate = rateSlider ? parseFloat(rateSlider.value) : 1;
+            utterance.pitch = pitchSlider ? parseFloat(pitchSlider.value) : 1;
+            utterance.volume = volumeSlider ? parseFloat(volumeSlider.value) : 1;
+            
+            utterance.onstart = () => {
+                ttsState.isPlaying = true;
+                ttsState.isPaused = false;
+                if (playBtn) playBtn.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="6" y="4" width="4" height="16"/>
+                        <rect x="14" y="4" width="4" height="16"/>
+                    </svg>
+                    Pause
+                `;
+                if (pauseBtn) pauseBtn.disabled = false;
+                if (stopBtn) stopBtn.disabled = false;
+            };
+            
+            utterance.onend = () => {
+                ttsState.isPlaying = false;
+                ttsState.isPaused = false;
+                if (playBtn) playBtn.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                    Putar Suara
+                `;
+                if (pauseBtn) pauseBtn.disabled = true;
+                if (stopBtn) stopBtn.disabled = true;
+            };
+            
+            utterance.onerror = (e) => {
+                console.error('TTS error:', e);
+                ttsState.isPlaying = false;
+                ttsState.isPaused = false;
+                if (playBtn) playBtn.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                    Putar Suara
+                `;
+                if (pauseBtn) pauseBtn.disabled = true;
+                if (stopBtn) stopBtn.disabled = true;
+            };
+            
+            ttsState.utterance = utterance;
+            window.speechSynthesis.speak(utterance);
+        }
+
+        function pauseTTS(page) {
+            const ttsState = page === 'voice' ? STATE.voiceTts : STATE.cameraTts;
+            const playBtn = document.getElementById(`${page}TtsPlayBtn`);
+            const pauseBtn = document.getElementById(`${page}TtsPauseBtn`);
+            
+            if (ttsState.isPlaying && !ttsState.isPaused) {
+                window.speechSynthesis.pause();
+                ttsState.isPaused = true;
+                if (playBtn) playBtn.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polygon points="5 3 19 12 5 21 5 3"/>
+                    </svg>
+                    Lanjutkan
+                `;
+            } else if (ttsState.isPaused) {
+                window.speechSynthesis.resume();
+                ttsState.isPaused = false;
+                if (playBtn) playBtn.innerHTML = `
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="6" y="4" width="4" height="16"/>
+                        <rect x="14" y="4" width="4" height="16"/>
+                    </svg>
+                    Pause
+                `;
+            }
+        }
+
+        function stopTTS(page) {
+            const ttsState = page === 'voice' ? STATE.voiceTts : STATE.cameraTts;
+            const playBtn = document.getElementById(`${page}TtsPlayBtn`);
+            const pauseBtn = document.getElementById(`${page}TtsPauseBtn`);
+            const stopBtn = document.getElementById(`${page}TtsStopBtn`);
+            
+            window.speechSynthesis.cancel();
+            ttsState.isPlaying = false;
+            ttsState.isPaused = false;
+            
+            if (playBtn) playBtn.innerHTML = `
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <polygon points="5 3 19 12 5 21 5 3"/>
+                </svg>
+                Putar Suara
+            `;
+            if (pauseBtn) pauseBtn.disabled = true;
+            if (stopBtn) stopBtn.disabled = true;
         }
 
         // Auth
@@ -1719,6 +2297,10 @@
             
             // Stop feedback camera
             stopFeedbackCamera();
+            
+            // Stop TTS
+            stopTTS('voice');
+            stopTTS('camera');
             
             // Reset feedback text
             const feedbackText = document.getElementById('feedbackText');
